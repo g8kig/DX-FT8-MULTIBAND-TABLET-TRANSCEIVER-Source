@@ -8,7 +8,7 @@ The original sources for the transceiver firmware are stored on a shared google 
 
 I was unable to build these sources. 
 I held an email exchange with Charles Hill, W5BAA. 
-Charlie supplied me with a very useful PDF to get the sources building using the STM32 Cube IDE. 
+Charley supplied me with a very useful PDF to get the sources building using the STM32 Cube IDE. 
 I am using the STM32CubeIDE Version: 1.16.1
 
 Unfortunately I was still unable to build the sources due to build errors.
