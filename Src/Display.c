@@ -46,8 +46,8 @@ uint8_t test;
 int count;
 double Touch_Frequency;
 
-char current_QSO_receive_message[20];
-char current_QSO_xmit_message[20];
+char current_QSO_receive_message[40];
+char current_QSO_xmit_message[40];
 int max_log_messages = 4;
 display_message log_messages[4];
 
@@ -87,8 +87,8 @@ void update_log_display(int mode) {
 
 }
 
-char current_Beacon_receive_message[20];
-char current_Beacon_xmit_message[20];
+char current_Beacon_receive_message[40];
+char current_Beacon_xmit_message[40];
 int max_Beacon_log_messages = 10;
 display_message Beacon_log_messages[10];
 
@@ -130,16 +130,6 @@ void update_Beacon_log_display(int mode) {
 
 }
 
-/*
- void show_hz(uint16_t x, uint16_t y,uint32_t variable) {
- uint8_t string[10];   // print format stuff
- sprintf(string,"%8i",variable);
- BSP_LCD_SetFont (&Font16);
- BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
- BSP_LCD_DisplayStringAt(x, y, string, LEFT_MODE);
- }
- */
-
 void show_wide(uint16_t x, uint16_t y, int variable) {
 	char string[7];   // print format stuff
 	sprintf(string, "%6i", variable);
@@ -166,12 +156,8 @@ void show_short(uint16_t x, uint16_t y, uint8_t variable) {
 
 void show_UTC_time(uint16_t x, uint16_t y, int utc_hours, int utc_minutes,
 		int utc_seconds, int color) {
-	sprintf(rtc_time_string, "%2i:%2i:%2i", utc_hours, utc_minutes,
+	sprintf(rtc_time_string, "%02i:%02i:%02i", utc_hours, utc_minutes,
 			utc_seconds);
-	for (int i = 0; i < 9; i++)
-		if (rtc_time_string[i] == 32)
-			rtc_time_string[i] = 48;  //blank remover
-
 	BSP_LCD_SetFont(&Font16);
 
 	if (color == 0)
@@ -183,7 +169,7 @@ void show_UTC_time(uint16_t x, uint16_t y, int utc_hours, int utc_minutes,
 }
 
 void show_Real_Date(uint16_t x, uint16_t y, int date, int month, int year) {
-	sprintf(rtc_date_string, "%2i:%2i:%2i", date, month, year);
+	sprintf(rtc_date_string, "%02i:%02i:%02i", date, month, year);
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
 	BSP_LCD_DisplayStringAt(x, y, (const uint8_t*) rtc_date_string, LEFT_MODE);
@@ -204,13 +190,8 @@ void setup_display(void) {
 	drawButton(5);
 	drawButton(6);
 	drawButton(7);
-	// Monitor_Only = 1;
 	drawButton(8);
 	drawButton(9);
-
-	//BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-	// BSP_LCD_DisplayStringAt(320, 0, "Gain",0x03);
-
 }
 
 void Set_Cursor_Frequency(uint16_t cursor_pos) {
@@ -268,9 +249,6 @@ int FT8_Touch(void) {
 		y_test = valy - 40;
 
 		FT_8_TouchIndex = y_test / 20;
-		//show_variable(300,100,valx);
-		// show_variable(340,100,valy);
-		// show_variable(380,100,FT_8_TouchIndex);
 
 		return 1;
 	}
@@ -286,9 +264,6 @@ int Xmit_message_Touch(void) {
 		y_test = valy - 160;
 
 		FT_8_MessageIndex = y_test / 20;
-		//show_variable(300,80,valx);
-		//show_variable(340,80,valy);
-		//show_variable(380,80,FT_8_MessageIndex);
 
 		return 1;
 	}

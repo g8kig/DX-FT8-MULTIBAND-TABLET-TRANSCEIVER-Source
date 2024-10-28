@@ -11,7 +11,7 @@
 #include <math.h>
 #include "arm_math.h"
 
-extern char Target_Frequency[8]; // Five character locator  + /0
+extern char Target_Frequency[8]; // Seven character frequency  + /0
 extern char Locator[5]; // four character locator  + /0
 extern char Station_Call[7]; //six character call sign + /0
 extern char Target_Call[7]; //six character call sign + /0

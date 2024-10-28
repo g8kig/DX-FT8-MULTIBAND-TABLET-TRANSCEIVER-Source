@@ -39,7 +39,7 @@
 
 #include "button.h"
 
-char Target_Frequency[8]; // Five character locator  + /0
+char Target_Frequency[8]; // Seven character frequency  + /0
 char Locator[5]; // four character locator  + /0
 char Station_Call[7]; //six character call sign + /0
 char Target_Call[7]; //six character call sign + /0
@@ -57,11 +57,13 @@ static uint8_t isInitialized = 0;
 static FATFS FS;
 static FIL fil;
 
+const char CQ[] = "CQ";
+const char seventy_three[] = "RR73";
+const uint8_t blank[] = "                      ";
+
 void set_cq(void) {
-	char CQ[] = "CQ";
 	char message[18];
 	uint8_t packed[K_BYTES];
-	const uint8_t blank[] = "                      ";
 
 	sprintf(message, "%s %s %s", CQ, Station_Call, Locator);
 
@@ -76,20 +78,24 @@ void set_cq(void) {
 
 }
 
+static int in_range(int num, int min, int max) {
+	if (num < min)
+		return min;
+	if (num > max)
+		return max;
+	return num;
+}
+
 void set_reply(uint16_t index) {
 
-	//char big_gulp[60];
-	char seventy_three[] = "RR73";
 	uint8_t packed[K_BYTES];
-	const uint8_t blank[] = "                      ";
-	char RSL[] = "     ";
+	char RSL[5];
 
-	itoa(Target_RSL, RSL, 10);
+	itoa(in_range(Target_RSL, -999, 9999), RSL, 10);
 
 	if (index == 0)
 		sprintf(reply_message, "%s %s R%s", Target_Call, Station_Call, RSL);
-
-	if (index == 1) {
+	else if (index == 1) {
 		sprintf(reply_message, "%s %s %s", Target_Call, Station_Call,
 				seventy_three);
 		write_ADIF_Log();
@@ -106,21 +112,18 @@ void set_reply(uint16_t index) {
 	BSP_LCD_DisplayStringAt(240, 240, blank, 0x03);
 	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 	BSP_LCD_DisplayStringAt(240, 240, (const uint8_t*) reply_message, 0x03);
-
 }
 
-char xmit_messages[4][19];
+static char xmit_messages[4][20];
 
 void compose_messages(void) {
-	char seventy_three[] = "RR73";
-	char CQ[] = "CQ";
-	char RSL[] = "     ";
+	char RSL[5];
 
-	itoa(Target_RSL, RSL, 10);
+	itoa(in_range(Target_RSL, -999, 9999), RSL, 10);
 
 	sprintf(xmit_messages[0], "%s %s %s", Target_Call, Station_Call, Locator);
 	sprintf(xmit_messages[1], "%s %s R%s", Target_Call, Station_Call, RSL);
-	sprintf(xmit_messages[2], "%s %s %3s", Target_Call, Station_Call,
+	sprintf(xmit_messages[2], "%s %s %s", Target_Call, Station_Call,
 			seventy_three);
 	sprintf(xmit_messages[3], "%s %s %s", CQ, Station_Call, Locator);
 
@@ -133,14 +136,11 @@ void compose_messages(void) {
 	BSP_LCD_DisplayStringAt(240, 180, (uint8_t*) xmit_messages[1], 0x03);
 	BSP_LCD_DisplayStringAt(240, 200, (uint8_t*) xmit_messages[2], 0x03);
 	BSP_LCD_DisplayStringAt(240, 220, (uint8_t*) xmit_messages[3], 0x03);
-
 }
 
 void que_message(int index) {
 
 	uint8_t packed[K_BYTES];
-
-	const uint8_t blank[] = "                      ";
 
 	pack77(xmit_messages[index], packed);
 	genft8(packed, tones);
@@ -160,8 +160,6 @@ void que_message(int index) {
 
 void clear_qued_message(void) {
 
-	const uint8_t blank[] = "                      ";
-
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 	BSP_LCD_DisplayStringAt(240, 140, blank, 0x03);
@@ -172,19 +170,14 @@ void clear_xmit_messages(void) {
 	BSP_LCD_FillRect(240, 130, 240, 120);
 }
 
-char *CurrentStationName;
-char StationFileName[32];
-
 void Read_Station_File(void) {
 
 	uint8_t i, j;
 	char read_buffer[132];
-	char *Station_Data;
-	strcpy(CurrentStationName, "StationData");
-	sprintf(StationFileName, "%s.txt", CurrentStationName);
 
 	f_mount(&FS, SDPath, 1);
-	if (f_open(&fil, StationFileName, FA_OPEN_ALWAYS | FA_READ) == FR_OK) {
+	if (f_open(&fil, "StationData.txt", FA_OPEN_ALWAYS | FA_READ) == FR_OK) {
+		char *Station_Data;
 
 		for (j = 0; j < 64; j++)
 			read_buffer[j] = 0;

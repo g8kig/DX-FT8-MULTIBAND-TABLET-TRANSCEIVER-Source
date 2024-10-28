@@ -215,38 +215,24 @@ void display_Real_Date(int x, int y) {
 void make_Real_Time(void) {
 
 	getTime(&rtc_hour, &rtc_minute, &rtc_second, &rtc_ampm, _24_hour_format);
-
-	sprintf((char*) log_rtc_time_string, "%2i%2i%2i", rtc_hour, rtc_minute,
+	sprintf((char*) log_rtc_time_string, "%02i%02i%02i", rtc_hour, rtc_minute,
 			rtc_second);
-
-	for (int i = 0; i < 9; i++)
-		if (log_rtc_time_string[i] == 32)
-			log_rtc_time_string[i] = 48;  //blank remover
 }
 
 void make_Real_Date(void) {
 
 	getDate(&rtc_dow, &rtc_date, &rtc_month, &rtc_year);
-	sprintf((char*) log_rtc_date_string, "%2s%2i%2i%2i", "20", rtc_year,
+	sprintf((char*) log_rtc_date_string, "20%02i%02i%02i", rtc_year,
 			rtc_month, rtc_date);
-
-	for (int i = 0; i < 9; i++)
-		if (log_rtc_date_string[i] == 32)
-			log_rtc_date_string[i] = 48;  //blank remover
 }
 
 void make_File_Name(void) {
 
-	//make_Real_Time();
 	make_Real_Date();
 
 	sprintf((char*) file_name_string, "%s.adi", log_rtc_date_string);
-	for (int i = 0; i < 24; i++)
-		if (file_name_string[i] == 32)
-			file_name_string[i] = 48;
 }
 
 void RTC_SetValue(int Idx, char newValue) {
 	s_RTC_Data[Idx].data = newValue;
-
 }
