@@ -98,14 +98,12 @@ void Options_StoreValue(int optionIdx) {
 	Write_Int_MicroSD((int16_t) optionIdx, option_value);
 }
 
+static char read_buffer[132];
+
 //Routine to write a integer value to the MicroSD starting at MicroSD address MicroSD_Addr
 void Write_Int_MicroSD(uint16_t DiskBlock, int16_t value) {
 
-	uint8_t i;
-	char read_buffer[132];
-
-	for (i = 0; i < 32; i++)
-		read_buffer[i] = 0;
+	memset(read_buffer, 0, sizeof(read_buffer));
 	f_mount(&SDFatFs, SDPath, 1);
 	f_open(&MyFile, "SaveParams.txt", FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
 	HAL_Delay(1);
@@ -118,11 +116,8 @@ void Write_Int_MicroSD(uint16_t DiskBlock, int16_t value) {
 
 int16_t Read_Int_MicroSD(uint16_t DiskBlock) {
 	int16_t result = 0;
-	uint8_t i;
-	char read_buffer[132];
 
-	for (i = 0; i < 32; i++)
-		read_buffer[i] = 0;
+	memset(read_buffer, 0, sizeof(read_buffer));
 	f_mount(&SDFatFs, SDPath, 1);
 	f_open(&MyFile, "SaveParams.txt", FA_READ);
 	f_lseek(&MyFile, DiskBlock * 32);

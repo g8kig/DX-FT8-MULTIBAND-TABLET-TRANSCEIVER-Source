@@ -48,7 +48,7 @@ double Touch_Frequency;
 
 char current_QSO_receive_message[40];
 char current_QSO_xmit_message[40];
-int max_log_messages = 4;
+const int max_log_messages = 4;
 display_message log_messages[4];
 
 void update_log_display(int mode) {
@@ -63,10 +63,9 @@ void update_log_display(int mode) {
 				current_QSO_receive_message);
 		log_messages[max_log_messages - 1].text_color = 0;
 	}
-
+	else
 	if (mode == 1) {
-		strcpy(log_messages[max_log_messages - 1].message,
-				current_QSO_xmit_message);
+		strcpy(log_messages[max_log_messages - 1].message, current_QSO_xmit_message);
 		log_messages[max_log_messages - 1].text_color = 1;
 	}
 
@@ -78,6 +77,7 @@ void update_log_display(int mode) {
 
 		if (log_messages[i].text_color == 0)
 			BSP_LCD_SetTextColor(LCD_COLOR_RED);
+		else
 		if (log_messages[i].text_color == 1)
 			BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
 
@@ -89,7 +89,7 @@ void update_log_display(int mode) {
 
 char current_Beacon_receive_message[40];
 char current_Beacon_xmit_message[40];
-int max_Beacon_log_messages = 10;
+const int max_Beacon_log_messages = 10;
 display_message Beacon_log_messages[10];
 
 void update_Beacon_log_display(int mode) {
@@ -106,7 +106,7 @@ void update_Beacon_log_display(int mode) {
 				current_Beacon_receive_message);
 		Beacon_log_messages[max_Beacon_log_messages - 1].text_color = 0;
 	}
-
+	else
 	if (mode == 1) {
 		strcpy(Beacon_log_messages[max_Beacon_log_messages - 1].message,
 				current_Beacon_xmit_message);
@@ -121,6 +121,7 @@ void update_Beacon_log_display(int mode) {
 
 		if (Beacon_log_messages[i].text_color == 0)
 			BSP_LCD_SetTextColor(LCD_COLOR_RED);
+		else
 		if (Beacon_log_messages[i].text_color == 1)
 			BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
 
@@ -130,9 +131,18 @@ void update_Beacon_log_display(int mode) {
 
 }
 
+int make_in_range(int variable, int minimum, int maximum)
+{
+	if (variable < minimum)
+		return minimum;
+	if (variable > maximum)
+		return maximum;
+	return variable;
+}
+
 void show_wide(uint16_t x, uint16_t y, int variable) {
 	char string[7];   // print format stuff
-	sprintf(string, "%6i", variable);
+	sprintf(string, "%6i", make_in_range(variable, -99999, 999999));
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
 	BSP_LCD_DisplayStringAt(x, y, (const uint8_t*) string, LEFT_MODE);
@@ -140,15 +150,15 @@ void show_wide(uint16_t x, uint16_t y, int variable) {
 
 void show_variable(uint16_t x, uint16_t y, int variable) {
 	char string[5];   // print format stuff
-	sprintf(string, "%4i", variable);
+	sprintf(string, "%4i", make_in_range(variable, -999, 9999));
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
 	BSP_LCD_DisplayStringAt(x, y, (const uint8_t*) string, LEFT_MODE);
 }
 
 void show_short(uint16_t x, uint16_t y, uint8_t variable) {
-	char string[4];   // print format stuff
-	sprintf(string, "%2i", variable);
+	char string[3];   // print format stuff
+	sprintf(string, "%2i", make_in_range(variable, 0, 99));
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
 	BSP_LCD_DisplayStringAt(x, y, (const uint8_t*) string, LEFT_MODE);
@@ -158,10 +168,12 @@ void show_UTC_time(uint16_t x, uint16_t y, int utc_hours, int utc_minutes,
 		int utc_seconds, int color) {
 	sprintf(rtc_time_string, "%02i:%02i:%02i", utc_hours, utc_minutes,
 			utc_seconds);
+
 	BSP_LCD_SetFont(&Font16);
 
 	if (color == 0)
 		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+	else
 	if (color == 1)
 		BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
 
@@ -192,6 +204,7 @@ void setup_display(void) {
 	drawButton(7);
 	drawButton(8);
 	drawButton(9);
+
 }
 
 void Set_Cursor_Frequency(uint16_t cursor_pos) {
@@ -234,12 +247,10 @@ void Process_Touch(void) {
 
 uint16_t FFT_Touch(void) {
 
-	// if  ((valx > FFT_X  && valx < FFT_X + FFT_W/2 ) && (valy > FFT_Y && valy < FFT_Y + 2 * FFT_H))
 	if ((valx > FFT_X && valx < FFT_X + FFT_W / 2)
 			&& (valy > FFT_Y && valy < 30))
 		return 1;
-	else
-		return 0;
+	return 0;
 }
 
 int FT8_Touch(void) {
@@ -252,9 +263,7 @@ int FT8_Touch(void) {
 
 		return 1;
 	}
-
-	else
-		return 0;
+	return 0;
 }
 
 int Xmit_message_Touch(void) {
@@ -267,9 +276,7 @@ int Xmit_message_Touch(void) {
 
 		return 1;
 	}
-
-	else
-		return 0;
+	return 0;
 }
 
 void Init_Waterfall(void) {
@@ -277,10 +284,9 @@ void Init_Waterfall(void) {
 	pWFBfr = &WF_Bfr[0];
 	WF_Count = 0;
 	WF_Line0 = FFT_H - 1;
-
 }
 
-int null_count, FFT_Line_Delay;
+static int null_count, FFT_Line_Delay;
 
 void Display_WF(void) {
 

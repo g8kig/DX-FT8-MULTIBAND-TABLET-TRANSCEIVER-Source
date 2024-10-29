@@ -22,7 +22,7 @@ typedef struct {
 } Decode;
 
 typedef struct {
-	char message[20];
+	char message[40];
 	int text_color;
 } display_message;
 
@@ -51,6 +51,7 @@ void display_messages(int decoded_messages);
 int Check_CQ_Calling_Stations(int num_decoded, int reply_state);
 void clear_CQ_List_box(void);
 void clear_messages(void);
+int strindex(char s[], char t[]);
 void process_selected_Station(int stations_decoded, int TouchIndex);
 int Check_QSO_Calling_Stations(int num_decoded, int reply_state);
 void clear_log_stored_data(void);

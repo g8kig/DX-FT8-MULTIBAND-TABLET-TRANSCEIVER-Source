@@ -37,7 +37,7 @@ int ADC_DVC_Off = 90;
 int HP_Gain = 10;
 int freq_scale = 10;
 
-char display_frequency[] = "14.075";
+char display_frequency[10] = "14.075";
 
 extern uint16_t refClock;
 
