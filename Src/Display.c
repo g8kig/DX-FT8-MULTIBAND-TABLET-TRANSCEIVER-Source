@@ -19,34 +19,28 @@
 
 #define wf_offset 0
 
-static TS_StateTypeDef TS_State = { 0 };
-
 #define LEFT_MODE  3
 
 int FT_8_TouchIndex;
 int FT_8_MessageIndex;
 
-uint16_t cursor;
-char rtc_date_string[9];
-char rtc_time_string[9];
 int decode_flag;
 int FT8_Touch_Flag;
 int FT8_Message_Touch;
-
-const int WF_Line0 = FFT_H - 1;
-
-static uint8_t WF_Bfr[FFT_H * (ft8_buffer - ft8_min_bin) * 2];
-uint32_t cursor_line[FFT_W];
-
-const int power_waterfall_top = 94;
-uint16_t valx, valy;
-double Touch_Frequency;
-
+char rtc_date_string[9];
+char rtc_time_string[9];
 char current_QSO_receive_message[40];
 char current_QSO_xmit_message[40];
+uint16_t cursor;
+uint16_t valx, valy;
 
+const int WF_Line0 = FFT_H - 1;
+const int power_waterfall_top = 94;
 const int max_log_messages = 4;
+
+static uint8_t WF_Bfr[FFT_H * (ft8_buffer - ft8_min_bin) * 2];
 static display_message log_messages[4];
+static TS_StateTypeDef TS_State = { 0 };
 
 void update_log_display(int mode) {
 
@@ -59,10 +53,9 @@ void update_log_display(int mode) {
 		strcpy(log_messages[max_log_messages - 1].message,
 				current_QSO_receive_message);
 		log_messages[max_log_messages - 1].text_color = 0;
-	}
-	else
-	if (mode == 1) {
-		strcpy(log_messages[max_log_messages - 1].message, current_QSO_xmit_message);
+	} else if (mode == 1) {
+		strcpy(log_messages[max_log_messages - 1].message,
+				current_QSO_xmit_message);
 		log_messages[max_log_messages - 1].text_color = 1;
 	}
 
@@ -74,8 +67,7 @@ void update_log_display(int mode) {
 
 		if (log_messages[i].text_color == 0)
 			BSP_LCD_SetTextColor(LCD_COLOR_RED);
-		else
-		if (log_messages[i].text_color == 1)
+		else if (log_messages[i].text_color == 1)
 			BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
 
 		BSP_LCD_DisplayStringAt(240, 40 + i * 20,
@@ -103,9 +95,7 @@ void update_Beacon_log_display(int mode) {
 		strcpy(Beacon_log_messages[max_Beacon_log_messages - 1].message,
 				current_Beacon_receive_message);
 		Beacon_log_messages[max_Beacon_log_messages - 1].text_color = 0;
-	}
-	else
-	if (mode == 1) {
+	} else if (mode == 1) {
 		strcpy(Beacon_log_messages[max_Beacon_log_messages - 1].message,
 				current_Beacon_xmit_message);
 		Beacon_log_messages[max_Beacon_log_messages - 1].text_color = 1;
@@ -119,8 +109,7 @@ void update_Beacon_log_display(int mode) {
 
 		if (Beacon_log_messages[i].text_color == 0)
 			BSP_LCD_SetTextColor(LCD_COLOR_RED);
-		else
-		if (Beacon_log_messages[i].text_color == 1)
+		else if (Beacon_log_messages[i].text_color == 1)
 			BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
 
 		BSP_LCD_DisplayStringAt(240, 40 + i * 20,
@@ -129,8 +118,7 @@ void update_Beacon_log_display(int mode) {
 
 }
 
-int make_in_range(int variable, int minimum, int maximum)
-{
+int make_in_range(int variable, int minimum, int maximum) {
 	if (variable < minimum)
 		return minimum;
 	if (variable > maximum)
@@ -171,8 +159,7 @@ void show_UTC_time(uint16_t x, uint16_t y, int utc_hours, int utc_minutes,
 
 	if (color == 0)
 		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-	else
-	if (color == 1)
+	else if (color == 1)
 		BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
 
 	BSP_LCD_DisplayStringAt(x, y, (const uint8_t*) rtc_time_string, LEFT_MODE);
@@ -310,8 +297,8 @@ void Display_WF(void) {
 	if (Auto_Sync) {
 		for (int x = 0; x < ft8_buffer - ft8_min_bin; x++) {
 			if ((*(WF_Bfr + 39 * FFT_W + 2 * x)) > 0)
-			if (++null_count >= 3)
-				break;
+				if (++null_count >= 3)
+					break;
 		}
 
 		if (null_count < 3 && ++FFT_Line_Delay >= 2) {

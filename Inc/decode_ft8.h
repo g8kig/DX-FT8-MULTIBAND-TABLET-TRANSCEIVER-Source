@@ -18,7 +18,7 @@ typedef struct {
 	int freq_hz;
 	int sync_score;
 	int snr;
-	char target[5];
+	char target[7];
 } Decode;
 
 typedef struct {

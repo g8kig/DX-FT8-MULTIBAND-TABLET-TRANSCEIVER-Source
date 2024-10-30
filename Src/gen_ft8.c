@@ -86,8 +86,7 @@ void set_reply(uint16_t index) {
 
 	if (index == 0)
 		sprintf(reply_message, "%s %s R%s", Target_Call, Station_Call, RSL);
-
-	if (index == 1) {
+	else if (index == 1) {
 		sprintf(reply_message, "%s %s %s", Target_Call, Station_Call,
 				seventy_three);
 		write_ADIF_Log();
@@ -154,7 +153,6 @@ void que_message(int index) {
 
 void clear_qued_message(void) {
 
-
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 	BSP_LCD_DisplayStringAt(240, 140, blank, 0x03);
@@ -165,31 +163,32 @@ void clear_xmit_messages(void) {
 	BSP_LCD_FillRect(240, 130, 240, 120);
 }
 
-static char read_buffer[132];
 
 void Read_Station_File(void) {
-
-	uint8_t i, j;
-	char *Station_Data;
 
 	f_mount(&FS, SDPath, 1);
 	if (f_open(&fil, "StationData.txt", FA_OPEN_ALWAYS | FA_READ) == FR_OK) {
 
-		for (j = 0; j < 64; j++)
-			read_buffer[j] = 0;
+		char read_buffer[80] = {0};
+
 		f_lseek(&fil, 0);
-		f_gets(read_buffer, 64, &fil);
-		i = strlen(read_buffer);
+		f_gets(read_buffer, sizeof(read_buffer), &fil);
+
+		int i = strlen(read_buffer);
 		read_buffer[i] = 0;
 
-		Station_Data = strtok(read_buffer, ":");
-		strcpy(Station_Call, Station_Data);
-		Station_Data = strtok(NULL, ":");
-		strcpy(Locator, Station_Data);
+		char *Station_Data = strtok(read_buffer, ":");
 
-		f_close(&fil);
+		if (Station_Data != NULL) {
+			strcpy(Station_Call, Station_Data);
+			Station_Data = strtok(NULL, ":");
+			if (Station_Data != NULL) {
+				strcpy(Locator, Station_Data);
+			}
+
+			f_close(&fil);
+		}
 	}
-
 }
 
 void clear_reply_message_box(void) {
@@ -210,8 +209,7 @@ void SD_Initialize(void) {
 			FATFS_LinkDriver(&SD_Driver, SDPath);
 		} else {
 			BSP_LCD_DisplayStringAt(0, 100, (uint8_t*) "Insert SD.", 0x03);
-			while (BSP_SD_IsDetected() != SD_PRESENT) {
-			}
+			while (BSP_SD_IsDetected() != SD_PRESENT) ;
 			BSP_LCD_DisplayStringAt(0, 100, (uint8_t*) "Reboot Now.", 0x03);
 
 		}
