@@ -33,9 +33,7 @@ int decode_flag;
 int FT8_Touch_Flag;
 int FT8_Message_Touch;
 
-int WF_Line0;
-int WF_Count = 0;
-uint8_t *pWFBfr;
+int WF_Line0 = FFT_H - 1;
 
 uint8_t WF_Bfr[FFT_H * (ft8_buffer - ft8_min_bin) * 2];
 uint32_t cursor_line[FFT_W];
@@ -279,13 +277,6 @@ int Xmit_message_Touch(void) {
 	return 0;
 }
 
-void Init_Waterfall(void) {
-
-	pWFBfr = &WF_Bfr[0];
-	WF_Count = 0;
-	WF_Line0 = FFT_H - 1;
-}
-
 static int null_count, FFT_Line_Delay;
 
 void Display_WF(void) {
@@ -293,7 +284,7 @@ void Display_WF(void) {
 	if (ft8_marker == 1) {
 
 		for (int x = 0; x < (FFT_W); x++)
-			*(pWFBfr + (FFT_W * WF_Line0) + x) = 63;
+			*(WF_Bfr + (FFT_W * WF_Line0) + x) = 63;
 		ft8_marker = 0;
 
 	} else {
@@ -301,10 +292,10 @@ void Display_WF(void) {
 		for (int x = 0; x < FFT_W; x++) {
 			if (FFT_Buffer[x + 2 * ft8_min_bin] >= 0
 					&& FFT_Buffer[x + 2 * ft8_min_bin] < 64)
-				*(pWFBfr + (FFT_W * WF_Line0) + x) = (uint8_t) FFT_Buffer[x
+				*(WF_Bfr + (FFT_W * WF_Line0) + x) = (uint8_t) FFT_Buffer[x
 						+ 2 * ft8_min_bin];
 			else
-				*(pWFBfr + (FFT_W * WF_Line0) + x) = 63;
+				*(WF_Bfr + (FFT_W * WF_Line0) + x) = 63;
 		}
 	}
 
@@ -312,19 +303,19 @@ void Display_WF(void) {
 	for (int y = 0; y < WF_Line0; y++) {
 		for (int x = 0; x < FFT_W; x++) {
 
-			*(pWFBfr + (FFT_W * y) + x) = *(pWFBfr + (FFT_W * (y + 1)) + x);
+			*(WF_Bfr + (FFT_W * y) + x) = *(WF_Bfr + (FFT_W * (y + 1)) + x);
 		}
 	}
 
 	for (int y = 0; y < FFT_H; y++) {
 		for (int x = 0; x < ft8_buffer - ft8_min_bin; x++) {
-			BSP_LCD_DrawPixel(x, y, WFPalette[(*(pWFBfr + y * FFT_W + 2 * x))]);
+			BSP_LCD_DrawPixel(x, y, WFPalette[(*(WF_Bfr + y * FFT_W + 2 * x))]);
 		}
 	}
 
 	if (Auto_Sync) {
 		for (int x = 0; x < ft8_buffer - ft8_min_bin; x++) {
-			if ((*(pWFBfr + 39 * FFT_W + 2 * x)) > 0)
+			if ((*(WF_Bfr + 39 * FFT_W + 2 * x)) > 0)
 				null_count++;
 
 		}

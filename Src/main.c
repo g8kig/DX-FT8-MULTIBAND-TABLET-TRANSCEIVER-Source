@@ -121,7 +121,6 @@ int main(void) {
 	HAL_Delay(10);
 	receive_sequence();
 	HAL_Delay(10);
-	Init_Waterfall();
 	Set_HP_Gain(30);
 	HAL_Delay(10);
 
