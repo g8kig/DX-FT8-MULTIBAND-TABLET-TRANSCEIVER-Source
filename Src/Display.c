@@ -19,7 +19,7 @@
 
 #define wf_offset 0
 
-TS_StateTypeDef TS_State = { 0 };
+static TS_StateTypeDef TS_State = { 0 };
 
 #define LEFT_MODE  3
 
@@ -33,21 +33,20 @@ int decode_flag;
 int FT8_Touch_Flag;
 int FT8_Message_Touch;
 
-int WF_Line0 = FFT_H - 1;
+const int WF_Line0 = FFT_H - 1;
 
-uint8_t WF_Bfr[FFT_H * (ft8_buffer - ft8_min_bin) * 2];
+static uint8_t WF_Bfr[FFT_H * (ft8_buffer - ft8_min_bin) * 2];
 uint32_t cursor_line[FFT_W];
 
-int power_waterfall_top = 94;
+const int power_waterfall_top = 94;
 uint16_t valx, valy;
-uint8_t test;
-int count;
 double Touch_Frequency;
 
 char current_QSO_receive_message[40];
 char current_QSO_xmit_message[40];
+
 const int max_log_messages = 4;
-display_message log_messages[4];
+static display_message log_messages[4];
 
 void update_log_display(int mode) {
 
@@ -87,8 +86,9 @@ void update_log_display(int mode) {
 
 char current_Beacon_receive_message[40];
 char current_Beacon_xmit_message[40];
+
 const int max_Beacon_log_messages = 10;
-display_message Beacon_log_messages[10];
+static display_message Beacon_log_messages[10];
 
 void update_Beacon_log_display(int mode) {
 
@@ -210,13 +210,12 @@ void Set_Cursor_Frequency(uint16_t cursor_pos) {
 }
 
 void Process_Touch(void) {
-
 	if (!Tune_On && !xmit_flag && !Beacon_On)
 		sButtonData[5].state = 0;
 	else
 		sButtonData[5].state = 1;
 
-	test = BSP_TS_GetState(&TS_State);
+	BSP_TS_GetState(&TS_State);
 
 	if (TS_State.touchDetected > 0) {
 
@@ -253,9 +252,8 @@ uint16_t FFT_Touch(void) {
 
 int FT8_Touch(void) {
 
-	int y_test;
 	if ((valx > 0 && valx < 240) && (valy > 40 && valy < 240)) {
-		y_test = valy - 40;
+		int y_test = valy - 40;
 
 		FT_8_TouchIndex = y_test / 20;
 
@@ -266,9 +264,8 @@ int FT8_Touch(void) {
 
 int Xmit_message_Touch(void) {
 
-	int y_test;
 	if ((valx > 240 && valx < 480) && (valy > 160 && valy < 240)) {
-		y_test = valy - 160;
+		int y_test = valy - 160;
 
 		FT_8_MessageIndex = y_test / 20;
 
@@ -313,21 +310,16 @@ void Display_WF(void) {
 	if (Auto_Sync) {
 		for (int x = 0; x < ft8_buffer - ft8_min_bin; x++) {
 			if ((*(WF_Bfr + 39 * FFT_W + 2 * x)) > 0)
-				null_count++;
-
+			if (++null_count >= 3)
+				break;
 		}
 
-		if (null_count < 3) {
-
-			FFT_Line_Delay++;
-
-			if (FFT_Line_Delay >= 2) {
-				FT8_Sync();
-				Auto_Sync = 0;
-				FFT_Line_Delay = 0;
-				sButtonData[5].state = 0;
-				drawButton(5);
-			}
+		if (null_count < 3 && ++FFT_Line_Delay >= 2) {
+			FT8_Sync();
+			Auto_Sync = 0;
+			FFT_Line_Delay = 0;
+			sButtonData[5].state = 0;
+			drawButton(5);
 		}
 
 		null_count = 0;
