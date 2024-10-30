@@ -301,10 +301,7 @@ void Display_WF(void) {
 
 	//shift data in memory by one time stepft8_buffer
 	for (int y = 0; y < WF_Line0; y++) {
-		for (int x = 0; x < FFT_W; x++) {
-
-			*(WF_Bfr + (FFT_W * y) + x) = *(WF_Bfr + (FFT_W * (y + 1)) + x);
-		}
+		memcpy(WF_Bfr + (FFT_W * y), WF_Bfr + (FFT_W * (y + 1)), FFT_W);
 	}
 
 	for (int y = 0; y < FFT_H; y++) {
