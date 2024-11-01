@@ -42,8 +42,6 @@ FIL LogFile;
 
 void Open_Log_File(void) {
 
-	//char header[] = "ADIF EXPORT";
-
 	f_mount(&FS, "SD:", 1);
 	if (f_open(&LogFile, file_name_string,
 			FA_OPEN_ALWAYS | FA_WRITE | FA_OPEN_APPEND) == FR_OK) {

@@ -274,9 +274,6 @@ uint8_t set_freq(uint64_t freq, enum si5351_clock clk) {
 
 			// Set multisynth registers
 			set_ms(clk, ms_reg, int_mode, r_div, div_by_4);
-
-			// Reset the PLL
-			//pll_reset(pll_assignment[clk]);
 		}
 
 		return 0;
@@ -326,7 +323,7 @@ uint8_t set_freq(uint64_t freq, enum si5351_clock clk) {
 				r_div = select_r_div_ms67(&freq);
 
 				pll_freq = multisynth67_calc(freq, 0, &ms_reg);
-				//pllb_freq = pll_freq;
+
 				set_pll(pll_freq, SI5351_PLLB);
 			}
 		} else {
@@ -358,7 +355,6 @@ uint8_t set_freq(uint64_t freq, enum si5351_clock clk) {
 				r_div = select_r_div_ms67(&freq);
 
 				pll_freq = multisynth67_calc(freq, 0, &ms_reg);
-				//pllb_freq = pll_freq;
 				set_pll(pll_freq, pll_assignment[clk]);
 			}
 		}
@@ -453,7 +449,6 @@ void set_pll(uint64_t pll_freq, enum si5351_pll target_pll) {
 	// Derive the register values to write
 
 	// Prepare an array for parameters to be written to
-	//uint8_t *params = new uint8_t[20];  //chh
 	uint8_t params[20];
 	uint8_t i = 0;
 	uint8_t temp;
@@ -496,8 +491,6 @@ void set_pll(uint64_t pll_freq, enum si5351_pll target_pll) {
 		si5351_write_bulk(SI5351_PLLB_PARAMETERS, i, params);
 		pllb_freq = pll_freq;
 	}
-
-	//delete params;
 }
 
 /*
@@ -673,11 +666,6 @@ void drive_strength(enum si5351_clock clk, enum si5351_drive drive) {
  * the Si5351 datasheet.
  */
 void update_status(void) {
-	/*
-	 update_sys_status(&dev_status);
-	 update_int_status(&dev_int_status);
-	 */
-
 	//chh
 }
 
@@ -810,24 +798,6 @@ void set_int(enum si5351_clock clk, uint8_t enable) {
 	}
 
 	si5351_write(SI5351_CLK0_CTRL + (uint8_t) clk, reg_val);
-
-	// Integer mode indication
-	/*
-	 switch(clk)
-	 {
-	 case SI5351_CLK0:
-	 clk0_int_mode = enable;
-	 break;
-	 case SI5351_CLK1:
-	 clk1_int_mode = enable;
-	 break;
-	 case SI5351_CLK2:
-	 clk2_int_mode = enable;
-	 break;
-	 default:
-	 break;
-	 }
-	 */
 }
 
 /*
@@ -988,7 +958,7 @@ void set_clock_fanout(enum si5351_clock_fanout fanout, uint8_t enable) {
 		}
 		break;
 	case SI5351_FANOUT_MS:
-		if (enable) {
+s		if (enable) {
 			reg_val |= SI5351_MULTISYNTH_ENABLE;
 		} else {
 			reg_val &= ~(SI5351_MULTISYNTH_ENABLE);
@@ -1012,9 +982,6 @@ void set_clock_fanout(enum si5351_clock_fanout fanout, uint8_t enable) {
 void set_pll_input(enum si5351_pll pll, enum si5351_pll_input input) {
 	uint8_t reg_val;
 	reg_val = si5351_read(SI5351_PLL_INPUT_SOURCE);
-
-	// Clear the bits first
-	//reg_val &= ~(SI5351_CLKIN_DIV_MASK);
 
 	switch (pll) {
 	case SI5351_PLLA:
@@ -1075,7 +1042,6 @@ void set_vcxo(uint64_t pll_freq, uint8_t ppm) {
 	// Derive the register values to write
 
 	// Prepare an array for parameters to be written to
-	//uint8_t *params = new uint8_t[20];  //chh
 	uint8_t params[20];
 	uint8_t i = 0;
 	uint8_t temp;
@@ -1113,8 +1079,6 @@ void set_vcxo(uint64_t pll_freq, uint8_t ppm) {
 	// Write the parameters
 	si5351_write_bulk(SI5351_PLLB_PARAMETERS, i, params);
 
-	//delete params;
-
 	// Write the VCXO parameters
 	vcxo_param = ((vcxo_param * ppm * SI5351_VCXO_MARGIN) / 100ULL)
 			/ 1000000ULL;
@@ -1139,49 +1103,25 @@ void set_vcxo(uint64_t pll_freq, uint8_t ppm) {
  * Set the reference frequency value for the desired reference oscillator
  */
 void set_ref_freq(uint32_t ref_freq, enum si5351_pll_input ref_osc) {
-	// uint8_t reg_val;
-	//reg_val = si5351_read(SI5351_PLL_INPUT_SOURCE);
-
-	// Clear the bits first
-	//reg_val &= ~(SI5351_CLKIN_DIV_MASK);
-
 	if (ref_freq <= 30000000UL) {
 		xtal_freq[(uint8_t) ref_osc] = ref_freq;
-		//reg_val |= SI5351_CLKIN_DIV_1;
 		if (ref_osc == SI5351_PLL_INPUT_CLKIN) {
 			clkin_div = SI5351_CLKIN_DIV_1;
 		}
 	} else if (ref_freq > 30000000UL && ref_freq <= 60000000UL) {
 		xtal_freq[(uint8_t) ref_osc] = ref_freq / 2;
-		//reg_val |= SI5351_CLKIN_DIV_2;
 		if (ref_osc == SI5351_PLL_INPUT_CLKIN) {
 			clkin_div = SI5351_CLKIN_DIV_2;
 		}
 	} else if (ref_freq > 60000000UL && ref_freq <= 100000000UL) {
 		xtal_freq[(uint8_t) ref_osc] = ref_freq / 4;
-		//reg_val |= SI5351_CLKIN_DIV_4;
 		if (ref_osc == SI5351_PLL_INPUT_CLKIN) {
 			clkin_div = SI5351_CLKIN_DIV_4;
 		}
-	} else {
-		//reg_val |= SI5351_CLKIN_DIV_1;
 	}
-
-	//si5351_write(SI5351_PLL_INPUT_SOURCE, reg_val);
 }
 
 uint8_t si5351_write_bulk(uint8_t addr, uint8_t bytes, uint8_t *data) {
-
-	/*
-	 Wire.beginTransmission(i2c_bus_addr);
-	 Wire.write(addr);
-	 for(int i = 0; i < bytes; i++)
-	 {
-	 Wire.write(data[i]);
-	 }
-	 return Wire.endTransmission();
-	 */
-
 	int i;
 	for (i = 0; i < bytes; i++) {
 		EXT_I2C_Write(SI5351_BUS_BASE_ADDR, addr + i, data[i]);
@@ -1192,44 +1132,16 @@ uint8_t si5351_write_bulk(uint8_t addr, uint8_t bytes, uint8_t *data) {
 }
 
 uint8_t si5351_write(uint8_t addr, uint8_t data) {
-	/*
-	 Wire.beginTransmission(i2c_bus_addr);
-	 Wire.write(addr);
-	 Wire.write(data);
-	 return Wire.endTransmission();
-	 */
-
 	uint8_t buffer[2];
 	buffer[0] = data;
 
-	//EXT_I2C_Write(SI5351_BUS_BASE_ADDR, addr, data);
 	EXT_I2C_Write_N(SI5351_BUS_BASE_ADDR, addr, buffer[0], 1);
 
 	return 0;
 }
 
 uint8_t si5351_read(uint8_t addr) {
-	/*
-
-	 uint8_t reg_val = 0;
-
-	 Wire.beginTransmission(i2c_bus_addr);
-	 Wire.write(addr);
-	 Wire.endTransmission();
-
-	 Wire.requestFrom(i2c_bus_addr, (uint8_t)1, (uint8_t)false);
-
-	 while(Wire.available())
-	 {
-	 reg_val = Wire.read();
-	 }
-
-	 return reg_val;
-
-	 */
-
 	return EXT_I2C_Read(SI5351_BUS_BASE_ADDR, addr);
-
 }
 
 uint64_t pll_calc(enum si5351_pll pll, uint64_t freq, Si5351RegSet *reg,
@@ -1240,7 +1152,6 @@ uint64_t pll_calc(enum si5351_pll pll, uint64_t freq, Si5351RegSet *reg,
 	} else {
 		ref_freq = xtal_freq[(uint8_t) pllb_ref_osc] * SI5351_FREQ_MULT;
 	}
-	//ref_freq = 15974400ULL * SI5351_FREQ_MULT;
 	uint32_t a, b, c, p1, p2, p3;
 	uint64_t lltmp; //, denom;
 
@@ -1269,13 +1180,6 @@ uint64_t pll_calc(enum si5351_pll pll, uint64_t freq, Si5351RegSet *reg,
 		freq = ref_freq * SI5351_PLL_A_MAX;
 	}
 
-	// Find best approximation for b/c = fVCO mod fIN
-	// denom = 1000ULL * 1000ULL;
-	// lltmp = freq % ref_freq;
-	// lltmp *= denom;
-	// do_div(lltmp, ref_freq);
-
-	//b = (((uint64_t)(freq % ref_freq)) * RFRAC_DENOM) / ref_freq;
 	if (vcxo) {
 		b = (((uint64_t) (freq % ref_freq)) * 1000000ULL) / ref_freq;
 		c = 1000000ULL;
@@ -1385,8 +1289,6 @@ uint64_t multisynth_calc(uint64_t freq, uint64_t pll_freq, Si5351RegSet *reg) {
 }
 
 uint64_t multisynth67_calc(uint64_t freq, uint64_t pll_freq, Si5351RegSet *reg) {
-	//uint8_t p1;
-	// uint8_t ret_val = 0;
 	uint32_t a;
 	uint64_t lltmp;
 

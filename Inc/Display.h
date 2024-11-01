@@ -37,8 +37,6 @@ extern char current_QSO_xmit_message[40];
 
 extern uint16_t valx, valy;
 
-//int Xmit_QSO_Message(void);
-
 void show_variable(uint16_t x, uint16_t y, int variable);
 
 void show_short(uint16_t x, uint16_t y, uint8_t variable);

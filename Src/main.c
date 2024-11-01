@@ -53,9 +53,6 @@
 
 TIM_HandleTypeDef hTim2;
 uint32_t current_time, start_time, ft8_time;
-//uint8_t ft8_hours, ft8_minutes, ft8_seconds;
-//uint32_t hours_fraction;
-//uint32_t minute_fraction;
 
 int master_decoded;
 int QSO_xmit;
@@ -160,7 +157,6 @@ int main(void) {
 							ft8_receive_sequence();
 							receive_sequence();
 							ft8_xmit_delay = 0;
-							//show_variable(0,240, ft8_xmit_delay) ;
 							if (Beacon_On == 0)
 								clear_qued_message();
 						}
@@ -231,13 +227,6 @@ void update_synchronization(void) {
 	current_time = HAL_GetTick();
 	ft8_time = current_time - start_time;
 
-	/*
-	ft8_hours = (int8_t) (ft8_time / 3600000);
-	hours_fraction = ft8_time % 3600000;
-	ft8_minutes = (int8_t) (hours_fraction / 60000);
-	ft8_seconds = (int8_t) ((hours_fraction % 60000) / 1000);
-	*/
-
 	if (ft8_time % 15000 <= 160 || FT_8_counter > 90) {
 
 		ft8_flag = 1;
@@ -263,7 +252,6 @@ void update_slot_status(void) {
 	slot_state = 0;
 
 }
-
 
 /**
  * @brief  HID application Init

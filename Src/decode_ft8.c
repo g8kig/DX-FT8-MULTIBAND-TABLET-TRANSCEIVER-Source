@@ -42,7 +42,6 @@ static Decode new_decoded[20];  //chh 27 Feb
 extern char current_QSO_receive_message[];
 extern char current_Beacon_receive_message[];
 
-
 static display_message display[10];
 
 static Calling_Station Answer_CQ[50];  //
@@ -138,9 +137,6 @@ int ft8_decode(void) {
 				display_RSL = (int) ((raw_RSL - 160)) / 6;
 				new_decoded[num_decoded].snr = display_RSL;
 
-
-
-				// TODO Decode.field3 is 7 bytes but Decode.target is only 5
 				if (validate_locator(field3) == 1) {
 					strcpy(new_decoded[num_decoded].target, field3);
 				} else {
@@ -169,7 +165,6 @@ void display_messages(int decoded_messages) {
 		const char *field2 = new_decoded[i].field2;
 		const char *field3 = new_decoded[i].field3;
 
-		// TODO display_message.message is 20 characters but 40 required.
 		sprintf(display[i].message, "%s %s %s", field1, field2, field3);
 
 		if (strcmp(CQ, field1) == 0)
@@ -269,7 +264,6 @@ int Check_Calling_Stations(int num_decoded, int reply_state) {
 				strcpy(Target_Call, field2);
 				Target_RSL = new_decoded[i].snr;
 
-				//set_reply(0);
 				if (Beacon_On == 1)set_reply(0);
 
 				Beacon_Reply_Status = 1;
@@ -289,8 +283,6 @@ int Check_Calling_Stations(int num_decoded, int reply_state) {
 				sprintf(current_Beacon_receive_message, " %s %s %s", field1, field2, field3);
 				sprintf(current_QSO_receive_message, " %s %s %s", field1, field2, field3);
 
-				//update_Beacon_log_display(0);
-
 			    if (Beacon_On == 1) update_Beacon_log_display(0);
 			    if(Beacon_On == 0) update_log_display(0);
 
@@ -300,8 +292,6 @@ int Check_Calling_Stations(int num_decoded, int reply_state) {
 					strcpy(Target_Locator, Answer_CQ[old_call_address].locator);
 
 					Target_RSL = Answer_CQ[old_call_address].RSL;
-
-					//set_reply(1);
 
 					if (Beacon_On == 1) set_reply(1);
 
@@ -343,15 +333,6 @@ void process_selected_Station(int stations_decoded, int TouchIndex) {
 
 }
 
-/*
-void clear_CQ_List_box(void) {
-
-	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-	BSP_LCD_FillRect(240, 40, 240, 200);
-	num_CQ_calls = 0;
-}
-*/
-
 void set_QSO_Xmit_Freq(int freq) {
 
 	freq = freq - ft8_min_freq;
@@ -359,10 +340,7 @@ void set_QSO_Xmit_Freq(int freq) {
 
 	Set_Cursor_Frequency();
 	show_variable(400, 25,(int)  NCO_Frequency );
-    }
-
-
-
+}
 
 static int strindex(const char s[], const char t[]) {
 	int i, j, k, result;

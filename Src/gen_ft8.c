@@ -39,8 +39,6 @@
 
 #include "button.h"
 
-
-
 char Target_Frequency[8]; // Seven character frequency  + /0
 char Locator[5]; // four character locator  + /0
 char Station_Call[7]; //six character call sign + /0
@@ -103,10 +101,6 @@ void set_reply(uint16_t index) {
 		write_ADIF_Log();
 	}
 
-
-
-
-
 	strcpy(current_Beacon_xmit_message, reply_message);
 	update_Beacon_log_display(1);
 
@@ -120,8 +114,6 @@ void set_reply(uint16_t index) {
 	BSP_LCD_DisplayStringAt(240, 240, (const uint8_t*) reply_message, 0x03);
 }
 
-//static char xmit_messages[4][20];
-
 static char xmit_messages[3][20];
 
 void compose_messages(void) {
@@ -133,18 +125,9 @@ void compose_messages(void) {
 	sprintf(xmit_messages[1],"%s %s %R%s", Target_Call,Station_Call,RSL);
 	sprintf(xmit_messages[2], "%s %s %s", Target_Call, Station_Call,
 			seventy_three);
-	//sprintf(xmit_messages[3], "%s %s %s", CQ, Station_Call, Locator);
-
 
 	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 	BSP_LCD_DisplayStringAt(240, 240, xmit_messages[0],0x03);
-
-	/*
-	BSP_LCD_DisplayStringAt(240, 160, (uint8_t*) xmit_messages[0], 0x03);
-	BSP_LCD_DisplayStringAt(240, 180, (uint8_t*) xmit_messages[1], 0x03);
-	BSP_LCD_DisplayStringAt(240, 200, (uint8_t*) xmit_messages[2], 0x03);
-	BSP_LCD_DisplayStringAt(240, 220, (uint8_t*) xmit_messages[3], 0x03);
-	*/
 }
 
 void que_message(int index) {
@@ -156,11 +139,9 @@ void que_message(int index) {
 
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-	//BSP_LCD_DisplayStringAt(240, 140, blank, 0x03);
 	BSP_LCD_DisplayStringAt(240, 220, blank,0x03);
 
 	BSP_LCD_SetTextColor(LCD_COLOR_RED);
-	//BSP_LCD_DisplayStringAt(240, 140, (uint8_t*) xmit_messages[index], 0x03);
 	BSP_LCD_DisplayStringAt(240, 220, xmit_messages[index],0x03);
 
 	strcpy(current_QSO_xmit_message, xmit_messages[index]);
@@ -174,13 +155,11 @@ void clear_qued_message(void) {
 
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-	//BSP_LCD_DisplayStringAt(240, 140, blank, 0x03);
 	BSP_LCD_DisplayStringAt(240, 220, blank,0x03);
 }
 
 void clear_xmit_messages(void) {
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-	//BSP_LCD_FillRect(240, 130, 240, 120);
     BSP_LCD_DisplayStringAt(240, 240, blank,0x03);
 }
 
@@ -213,7 +192,6 @@ void Read_Station_File(void) {
 void clear_reply_message_box(void) {
 
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-	//BSP_LCD_FillRect(240, 40, 240, 201);
 	BSP_LCD_FillRect(240, 40, 240, 215);
 }
 

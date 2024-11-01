@@ -35,20 +35,13 @@ void service_QSO_mode(int decoded_signals, int message_touch){
 
 	receive_status = Check_Calling_Stations(decoded_signals, 0);
 
-	//	receive_status = Check_QSO_Calling_Stations(decoded_signals, 0);
-
-
 		if(receive_status == 1 && Auto_QSO_State != 2 && stop_QSO_reply == 0 ) {
 			Auto_QSO_State = 2;
-			//show_variable(200,350, Auto_QSO_State);
-			//show_variable(250,240, 2);
 		}
 
 		switch (Auto_QSO_State) {
 
 		case 0:
-			//show_variable(200,240, Auto_QSO_State);
-			//show_variable(250,240, 0);
 		break;
 
 		case 1:
@@ -60,27 +53,18 @@ void service_QSO_mode(int decoded_signals, int message_touch){
 				QSO_xmit_count = 0;
 				clear_xmit_messages();
 			}
-			//show_variable(200,240, Auto_QSO_State);
-			//show_variable(250,240, 3);
-			//show_variable(300,240, QSO_xmit_count);
 		break;
 
 		case 2:
-		//	if(receive_status ==1){
 			que_message(1);
 			QSO_xmit = 1;
 			Auto_QSO_State = 3;
-			//show_variable(200,240, Auto_QSO_State);
-			//show_variable(250,240, 4);
-		//	}
 		break;
 
 		case 3:
 			que_message(2);
 			QSO_xmit = 1;
 			Auto_QSO_State = 4;
-			//show_variable(200,240, Auto_QSO_State);
-			//show_variable(250,240, 5);
 		break;
 
 		case 4:
@@ -90,11 +74,8 @@ void service_QSO_mode(int decoded_signals, int message_touch){
 		break;
 
 
-		}
-
-
-
-		}
+	}
+}
 
 void service_Beacon_mode(int decoded_signals) {
 	int receive_status;
@@ -185,4 +166,3 @@ void set_Rcvr_Freq(void) {
 	F_Receive = ((start_freq * 1000ULL - 10000ULL) * 100ULL * 4ULL);
 	set_freq(F_Receive, SI5351_CLK1);
 }
-

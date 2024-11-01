@@ -40,11 +40,8 @@ extern SAI_HandleTypeDef haudio_out_sai;
 /* I2S handler declared in "stm32746g_discovery_audio.c" file */
 extern SAI_HandleTypeDef haudio_in_sai;
 
-//extern UART_HandleTypeDef UartHandle;
-
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
-//#define    USE_USB_FS
 /******************************************************************************/
 /*            Cortex-M7 Processor Exceptions Handlers                         */
 /******************************************************************************/
@@ -160,4 +157,4 @@ void AUDIO_OUT_SAIx_DMAx_IRQHandler(void) {
 void AUDIO_IN_SAIx_DMAx_IRQHandler(void) {
 	HAL_DMA_IRQHandler(haudio_in_sai.hdmarx);
 }
-
+s

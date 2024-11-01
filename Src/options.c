@@ -31,11 +31,11 @@ char SDPath[4]; /* SD card logical drive path */
 // Order must match OptionNumber in options.h
 OptionStruct s_optionsData[] = { {
 /*Name*/"  Band_Index ", //opt0
-		/*Init*/0,
-		/*Min */0,
-		/*Max */4,
-		/*Rate*/1,
-		/*Data*/0, } };
+		/*Init*/ 0,
+		/*Min */ 0,
+		/*Max */ 4,
+		/*Rate*/ 1,
+		/*Data*/ 0, } };
 
 int16_t Options_GetValue(int optionIdx) {
 	return s_optionsData[optionIdx].CurrentValue;

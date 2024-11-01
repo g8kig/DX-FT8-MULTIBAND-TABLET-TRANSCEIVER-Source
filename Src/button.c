@@ -34,8 +34,6 @@ int BandIndex;
 int AGC_Gain = 20;
 int ADC_DVC_Gain = 180;
 int ADC_DVC_Off = 90;
-//int HP_Gain = 10;
-//int freq_scale = 10;
 
 extern int Auto_QSO_State;
 

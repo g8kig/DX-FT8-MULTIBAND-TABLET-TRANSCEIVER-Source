@@ -83,11 +83,7 @@ void start_duplex(int mode) {
 
 	BSP_AUDIO_OUT_Play((uint16_t*) &out_buff, 2 * BUFFERSIZE);
 
-
-	//R_lgain = 0.5;
-
 	NoOp;
-
 }
 
 void transfer_buffers(void) {
@@ -131,7 +127,6 @@ void I2S2_RX_ProcessBuffer(uint16_t offset) {
 
 	static q15_t TX_I, TX_Q;
 	static long NCO_phz;
-	//float m_RMSConstant = 0.00001;
 
 	x_NCOphzinc = (PI2 * LO_Freq / (double) Sample_Frequency);
 
