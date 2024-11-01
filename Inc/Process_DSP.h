@@ -48,9 +48,9 @@ extern int32_t FFT_Mag_10[FFT_SIZE / 2];
 extern float mag_db[FFT_SIZE / 2 + 1];
 extern float window[FFT_SIZE];
 
-extern int RSL;
-extern int Gadc;
-extern int Gdac;
+//extern int RSL;
+//extern int Gadc;
+//extern int Gdac;
 
 void Process_FIR_I_32K(void);
 void Process_FIR_Q_32K(void);

@@ -39,6 +39,9 @@ static int validate_locator(const char locator[]);
 static int strindex(const char s[], const char t[]);
 
 static Decode new_decoded[20];  //chh 27 Feb
+extern char current_QSO_receive_message[];
+extern char current_Beacon_receive_message[];
+
 
 static display_message display[10];
 
@@ -129,9 +132,13 @@ int ft8_decode(void) {
 				strcpy(new_decoded[num_decoded].field2, field2);
 				strcpy(new_decoded[num_decoded].field3, field3);
 
+				new_decoded[num_decoded].slot = slot_state;
+
 				raw_RSL = (float) new_decoded[num_decoded].sync_score;
 				display_RSL = (int) ((raw_RSL - 160)) / 6;
 				new_decoded[num_decoded].snr = display_RSL;
+
+
 
 				// TODO Decode.field3 is 7 bytes but Decode.target is only 5
 				if (validate_locator(field3) == 1) {
@@ -253,12 +260,17 @@ int Check_Calling_Stations(int num_decoded, int reply_state) {
 
 			if (old_call == 0) {
 				sprintf(current_Beacon_receive_message, " %s %s %s", field1, field2, field3);
-				update_Beacon_log_display(0);
+				sprintf(current_QSO_receive_message, " %s %s %s", field1, field2, field3);
+
+			   // update_Beacon_log_display(0);
+				if(Beacon_On == 1) update_Beacon_log_display(0);
+				if(Beacon_On == 0) update_log_display(0);
 
 				strcpy(Target_Call, field2);
 				Target_RSL = new_decoded[i].snr;
 
-				set_reply(0);
+				//set_reply(0);
+				if (Beacon_On == 1)set_reply(0);
 
 				Beacon_Reply_Status = 1;
 
@@ -275,7 +287,12 @@ int Check_Calling_Stations(int num_decoded, int reply_state) {
 			if (old_call >= 1) {
 
 				sprintf(current_Beacon_receive_message, " %s %s %s", field1, field2, field3);
-				update_Beacon_log_display(0);
+				sprintf(current_QSO_receive_message, " %s %s %s", field1, field2, field3);
+
+				//update_Beacon_log_display(0);
+
+			    if (Beacon_On == 1) update_Beacon_log_display(0);
+			    if(Beacon_On == 0) update_log_display(0);
 
 				if (Answer_CQ[old_call_address].RR73 == 0) {
 
@@ -284,13 +301,19 @@ int Check_Calling_Stations(int num_decoded, int reply_state) {
 
 					Target_RSL = Answer_CQ[old_call_address].RSL;
 
-					set_reply(1);
+					//set_reply(1);
+
+					if (Beacon_On == 1) set_reply(1);
 
 					Answer_CQ[old_call_address].RR73 = 1;
 
 					Beacon_Reply_Status = 1;
 
 				}
+				else
+
+				Beacon_Reply_Status = 0;
+
 			}
 		}   //check for station call
 
@@ -302,53 +325,44 @@ int Check_Calling_Stations(int num_decoded, int reply_state) {
 
 void process_selected_Station(int stations_decoded, int TouchIndex) {
 
-	if (stations_decoded > 0 && TouchIndex <= stations_decoded) {
-		strcpy(Target_Call, new_decoded[TouchIndex].field2);
-		strcpy(Target_Locator, new_decoded[TouchIndex].target);
-		Target_RSL = new_decoded[TouchIndex].snr;
+	if(stations_decoded > 0 && TouchIndex <= stations_decoded ){
+	strcpy(Target_Call, new_decoded[TouchIndex].field2);
+	strcpy(Target_Locator, new_decoded[TouchIndex].target);
+	Target_RSL = new_decoded[TouchIndex].snr;
+	target_slot = new_decoded[TouchIndex].slot;
+	target_freq = new_decoded[TouchIndex].freq_hz;
+	set_QSO_Xmit_Freq(target_freq);
 
-		compose_messages();
+	compose_messages();
+	Auto_QSO_State = 1;
+	stop_QSO_reply = 0;
+
 	}
 
 	FT8_Touch_Flag = 0;
 
 }
 
+/*
 void clear_CQ_List_box(void) {
 
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 	BSP_LCD_FillRect(240, 40, 240, 200);
 	num_CQ_calls = 0;
 }
+*/
 
-int Check_QSO_Calling_Stations(int num_decoded, int reply_state) {
+void set_QSO_Xmit_Freq(int freq) {
 
-	int QSO_Status = 0;
+	freq = freq - ft8_min_freq;
+	cursor = (uint16_t) ( (float)freq / FFT_Resolution);
 
-	for (int i = 0; i < num_decoded; i++) {  //check to see if being called
-		char *field1 = new_decoded[i].field1;
-		if (strindex(field1, Station_Call) >= 0) {
+	Set_Cursor_Frequency();
+	show_variable(400, 25,(int)  NCO_Frequency );
+    }
 
-			sprintf(current_QSO_receive_message, " %s %s %s", field1,
-					new_decoded[i].field2, new_decoded[i].field3);
 
-			update_log_display(0);
 
-			QSO_Status = 1; //we already have a reply!!
-			break;
-		} //check for station call
-
-		else {
-
-			QSO_Status = 0;
-
-		} //check to see if being called
-
-	}
-
-	return QSO_Status;
-
-}
 
 static int strindex(const char s[], const char t[]) {
 	int i, j, k, result;

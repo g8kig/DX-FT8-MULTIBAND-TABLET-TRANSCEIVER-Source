@@ -29,7 +29,7 @@ q15_t out_buff[BUFFERSIZE];
 
 uint16_t buff_offset;
 
-float R_lgain;
+//float R_lgain;
 float x_NCOphzinc;
 
 int DSP_Flag;
@@ -83,7 +83,8 @@ void start_duplex(int mode) {
 
 	BSP_AUDIO_OUT_Play((uint16_t*) &out_buff, 2 * BUFFERSIZE);
 
-	R_lgain = 0.5;
+
+	//R_lgain = 0.5;
 
 	NoOp;
 
@@ -124,12 +125,13 @@ void BSP_AUDIO_OUT_HalfTransfer_CallBack(void) {
 }
 
 int frame_counter;
+float m_RMSConstant = 1.0 /65485.0;
 
 void I2S2_RX_ProcessBuffer(uint16_t offset) {
 
 	static q15_t TX_I, TX_Q;
 	static long NCO_phz;
-	float m_RMSConstant = 0.00001;
+	//float m_RMSConstant = 0.00001;
 
 	x_NCOphzinc = (PI2 * LO_Freq / (double) Sample_Frequency);
 
@@ -138,10 +140,8 @@ void I2S2_RX_ProcessBuffer(uint16_t offset) {
 		TX_I = (Sine_table[(NCO_phz >> 4) & 0xFFF]);
 		TX_Q = (Sine_table[((NCO_phz >> 4) + 0x400) & 0xFFF]);
 
-		FIR_I_In[i] = (q15_t) ((float) TX_I * (float) in_buff[i * 2 + offset]
-				* m_RMSConstant);
-		FIR_Q_In[i] = (q15_t) ((float) TX_Q
-				* (float) in_buff[i * 2 + 1 + offset] * m_RMSConstant);
+		FIR_I_In[i] = (q15_t) ((float) TX_I * (float) in_buff[i * 2 + offset] * m_RMSConstant);
+		FIR_Q_In[i] = (q15_t) ((float) TX_Q * (float) in_buff[i * 2 + 1 + offset] * m_RMSConstant);
 
 	}
 

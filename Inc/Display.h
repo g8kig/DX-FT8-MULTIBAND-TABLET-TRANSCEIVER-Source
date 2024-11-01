@@ -23,11 +23,21 @@ extern char rtc_time_string[9];
 extern int decode_flag;
 extern int FT8_Touch_Flag;
 extern int FT8_Message_Touch;
+
+extern int QSO_Xmit_Touch;
+extern int Xmit_QSO_Message(void);
+
+
+
 extern char current_QSO_receive_message[40];
 extern char current_Beacon_receive_message[40];
 extern char current_Beacon_xmit_message[40];
 extern char current_QSO_xmit_message[40];
+
+
 extern uint16_t valx, valy;
+
+//int Xmit_QSO_Message(void);
 
 void show_variable(uint16_t x, uint16_t y, int variable);
 
@@ -54,9 +64,13 @@ void Display_WF(void);
 
 int Xmit_message_Touch(void);
 
-void Set_Cursor_Frequency(uint16_t cursor_pos);
+void Set_Cursor_Frequency(void);
 
 void update_log_display(int mode);
+
+void clear_log_messages(void);
+
+void clear_Beacon_log_messages(void);
 
 void update_Beacon_log_display(int mode);
 

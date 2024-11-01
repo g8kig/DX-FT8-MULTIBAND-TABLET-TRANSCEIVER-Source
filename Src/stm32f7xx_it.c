@@ -40,7 +40,7 @@ extern SAI_HandleTypeDef haudio_out_sai;
 /* I2S handler declared in "stm32746g_discovery_audio.c" file */
 extern SAI_HandleTypeDef haudio_in_sai;
 
-extern UART_HandleTypeDef UartHandle;
+//extern UART_HandleTypeDef UartHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/

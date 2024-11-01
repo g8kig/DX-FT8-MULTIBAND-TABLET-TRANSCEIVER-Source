@@ -34,12 +34,14 @@ int BandIndex;
 int AGC_Gain = 20;
 int ADC_DVC_Gain = 180;
 int ADC_DVC_Off = 90;
-int HP_Gain = 10;
-int freq_scale = 10;
+//int HP_Gain = 10;
+//int freq_scale = 10;
+
+extern int Auto_QSO_State;
 
 char display_frequency[] = "14.075";
 
-extern uint16_t refClock;
+//extern uint16_t refClock;
 
 #define numBands 5
 
@@ -495,6 +497,8 @@ void executeButton(uint16_t index) {
 		clear_xmit_messages();
 		terminate_QSO();
 		FT8_Message_Touch = 0;
+	    Auto_QSO_State = 0;
+		clear_reply_message_box();
 
 		sButtonData[0].state = 1;
 		drawButton(0);
@@ -508,11 +512,17 @@ void executeButton(uint16_t index) {
 			Beacon_On = 0;
 			Beacon_State = 0;
 			clear_reply_message_box();
-		} else {
-			Beacon_On = 1;
-			clear_reply_message_box();
+			clear_log_messages();
 			clear_log_stored_data();
-			Beacon_State = 1;
+		} else {
+		   Beacon_On = 1;
+		   cursor = 112;  // 1000 Hz
+		   Set_Cursor_Frequency();
+		   show_variable(395, 25,(int)  NCO_Frequency );
+		   clear_reply_message_box();
+		   clear_log_stored_data();
+		   clear_Beacon_log_messages();
+		   Beacon_State = 1;
 		}
 		break;
 
@@ -601,6 +611,8 @@ void executeButton(uint16_t index) {
 		Options_StoreValue(0);
 		start_freq = sBand_Data[BandIndex].Frequency;
 		show_wide(380, 0, (int) start_freq);
+
+		sprintf(display_frequency,"%s",sBand_Data[BandIndex].display);
 
 		set_Rcvr_Freq();
 		HAL_Delay(10);

@@ -38,11 +38,11 @@ int32_t FFT_Mag_10[FFT_SIZE / 2];
 float mag_db[FFT_SIZE / 2 + 1];
 float window[FFT_SIZE];
 
-int plain_text[174];
-int iterations = 40;
-int test_results;
-double RSL_Mag;
-int RSL;
+//int plain_text[174];
+//int iterations = 40;
+//int test_results;
+//double RSL_Mag;
+//int RSL;
 double NCO_Frequency;
 
 q15_t FIR_State_I[NUM_FIR_COEF + (BUFFERSIZE / 4) - 1];
@@ -50,7 +50,8 @@ q15_t FIR_State_Q[NUM_FIR_COEF + (BUFFERSIZE / 4) - 1];
 
 arm_fir_instance_q15 S_FIR_I_32K = { NUM_FIR_COEF, &FIR_State_I[0],
 		&coeff_fir_I_32K[0] };
-arm_fir_instance_q15 S_FIR_Q_32K = { NUM_FIR_COEF, &FIR_State_Q[0],
+
+arm_fir_instance_q15 S_FIR_Q_32K = { NUM_FIR_COEF,&FIR_State_Q[0],
 		&coeff_fir_I_32K[0] };
 
 void Process_FIR_I_32K(void) {
@@ -86,6 +87,7 @@ float ft_blackman_i(int i, int N) {
 
 int master_offset;
 
+/*
 void process_FT8_FFT(void) {
 
 	for (int i = 0; i < input_gulp_size; i++) {
@@ -127,7 +129,41 @@ void process_FT8_FFT(void) {
 		}
 
 	}
+
+
 }
+*/
+
+void process_FT8_FFT(void) {
+
+		 for(int i = 0; i< input_gulp_size; i++) {
+			 extract_signal[i] = extract_signal[i + input_gulp_size];
+			 extract_signal[i+ input_gulp_size] = extract_signal[i + 2*input_gulp_size];
+			 extract_signal[i+ 2* input_gulp_size] =  FT8_Data[i];
+		 }
+
+		 if(ft8_flag == 1) {
+
+		 master_offset =  offset_step *  FT_8_counter;
+		 extract_power(master_offset);
+
+		 for(int k = 0; k<ft8_buffer; k++){
+
+		 FFT_Buffer[k] = (uint16_t )export_fft_power[k + master_offset ] ;
+		 }
+
+		Display_WF();
+
+		 FT_8_counter++;
+		 if (FT_8_counter == ft8_msg_samples)
+		 {ft8_flag = 0;
+		 decode_flag = 1;
+		 }
+
+		 }
+  }
+
+
 
 // Compute FFT magnitudes (log power) for each timeslot in the signal
 void extract_power(int offset) {
@@ -157,10 +193,17 @@ void extract_power(int offset) {
 				float db = (db1 + db2) / 2;
 
 				int scaled = (int) (db);
-				// export_fft_power[offset] = (scaled < 0) ? 0 : ((scaled > 255) ? 255 : scaled);
+
+				/*
 				export_fft_power[offset] =
 						(uint8_t) (scaled < 0) ?
 								0 : ((scaled > 255) ? 255 : scaled);
+				*/
+				export_fft_power[offset] =
+						(uint8_t) (scaled < 0) ?
+								0 : ((scaled > 63) ? 63 : scaled);
+
+
 				++offset;
 			}
 		}

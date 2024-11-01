@@ -53,13 +53,17 @@
 
 TIM_HandleTypeDef hTim2;
 uint32_t current_time, start_time, ft8_time;
-uint8_t ft8_hours, ft8_minutes, ft8_seconds;
-uint32_t hours_fraction;
-uint32_t minute_fraction;
+//uint8_t ft8_hours, ft8_minutes, ft8_seconds;
+//uint32_t hours_fraction;
+//uint32_t minute_fraction;
 
 int master_decoded;
 int QSO_xmit;
 int Xmit_DSP_counter;
+
+int slot_state;
+int target_slot;
+int target_freq;
 
 /* Private function prototypes -----------------------------------------------*/
 static void SystemClock_Config(void);
@@ -103,7 +107,7 @@ int main(void) {
 	start_Si5351();
 
 	cursor = 112;  // 1000 Hz
-	Set_Cursor_Frequency(cursor);
+	Set_Cursor_Frequency();
 	show_variable(400, 25, (int) NCO_Frequency);
 
 	show_short(405, 255, AGC_Gain);
@@ -181,6 +185,8 @@ int main(void) {
 
 			}
 
+			display_RealTime(100, 240);
+
 			if (Tune_On == 1) {
 				display_RealTime(100, 240);
 				display_Real_Date(0, 240);
@@ -191,6 +197,8 @@ int main(void) {
 		}
 
 		if (decode_flag == 1 && Tune_On == 0 && xmit_flag == 0) {
+
+			update_slot_status();
 
 			master_decoded = ft8_decode();
 
@@ -211,25 +219,24 @@ int main(void) {
 		if (Tune_On == 0 && FT8_Touch_Flag == 1 && Beacon_On == 0)
 			process_selected_Station(master_decoded, FT_8_TouchIndex);
 
-		if (Tune_On == 0 && FT8_Message_Touch == 1 && Beacon_On == 0) {
-			que_message(FT_8_MessageIndex);
-			FT8_Message_Touch = 0;
-			QSO_xmit = 1;
-		}
 
 		update_synchronization();
 
 	}
 }
 
+int slot_state,slot_number;
+
 void update_synchronization(void) {
 	current_time = HAL_GetTick();
 	ft8_time = current_time - start_time;
 
+	/*
 	ft8_hours = (int8_t) (ft8_time / 3600000);
 	hours_fraction = ft8_time % 3600000;
 	ft8_minutes = (int8_t) (hours_fraction / 60000);
 	ft8_seconds = (int8_t) ((hours_fraction % 60000) / 1000);
+	*/
 
 	if (ft8_time % 15000 <= 160 || FT_8_counter > 90) {
 
@@ -238,9 +245,25 @@ void update_synchronization(void) {
 		ft8_marker = 1;
 		decode_flag = 0;
 		display_RealTime(100, 240);
+
+		if(QSO_xmit == 1 && target_slot == slot_state) {
+			 		setup_to_transmit_on_next_DSP_Flag();
+			 		update_log_display(1);
+			 		QSO_xmit = 0;
+			 	}
 	}
 
 }
+
+void update_slot_status(void) {
+
+	if (slot_state == 0 )
+	slot_state = 1;
+	else
+	slot_state = 0;
+
+}
+
 
 /**
  * @brief  HID application Init

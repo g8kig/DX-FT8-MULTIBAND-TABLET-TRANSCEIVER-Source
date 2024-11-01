@@ -26,7 +26,7 @@ extern q15_t out_buff[BUFFERSIZE];
 
 extern uint16_t buff_offset;
 
-extern float R_lgain;
+//extern float R_lgain;
 extern float x_NCOphzinc;
 
 extern int DSP_Flag;

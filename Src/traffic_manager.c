@@ -22,16 +22,79 @@
 int CQ_State;
 int Beacon_State;
 
-void service_QSO_mode(int decoded_signals, int message_touch) {
-	Check_QSO_Calling_Stations(decoded_signals, 0);
 
-	if (QSO_xmit == 1) {
-		setup_to_transmit_on_next_DSP_Flag();
-		update_log_display(1);
-		QSO_xmit = 0;
-	}
+int Auto_QSO_State;
+int QSO_xmit_count;
+int CQ_State;
+int stop_QSO_reply;
 
-}
+
+void service_QSO_mode(int decoded_signals, int message_touch){
+
+	int receive_status;
+
+	receive_status = Check_Calling_Stations(decoded_signals, 0);
+
+	//	receive_status = Check_QSO_Calling_Stations(decoded_signals, 0);
+
+
+		if(receive_status == 1 && Auto_QSO_State != 2 && stop_QSO_reply == 0 ) {
+			Auto_QSO_State = 2;
+			//show_variable(200,350, Auto_QSO_State);
+			//show_variable(250,240, 2);
+		}
+
+		switch (Auto_QSO_State) {
+
+		case 0:
+			//show_variable(200,240, Auto_QSO_State);
+			//show_variable(250,240, 0);
+		break;
+
+		case 1:
+			que_message(0);
+			QSO_xmit = 1;
+			QSO_xmit_count ++;
+			if(QSO_xmit_count == 3) {
+				Auto_QSO_State = 0;
+				QSO_xmit_count = 0;
+				clear_xmit_messages();
+			}
+			//show_variable(200,240, Auto_QSO_State);
+			//show_variable(250,240, 3);
+			//show_variable(300,240, QSO_xmit_count);
+		break;
+
+		case 2:
+		//	if(receive_status ==1){
+			que_message(1);
+			QSO_xmit = 1;
+			Auto_QSO_State = 3;
+			//show_variable(200,240, Auto_QSO_State);
+			//show_variable(250,240, 4);
+		//	}
+		break;
+
+		case 3:
+			que_message(2);
+			QSO_xmit = 1;
+			Auto_QSO_State = 4;
+			//show_variable(200,240, Auto_QSO_State);
+			//show_variable(250,240, 5);
+		break;
+
+		case 4:
+			clear_xmit_messages();
+			Auto_QSO_State = 0;
+			stop_QSO_reply = 1;
+		break;
+
+
+		}
+
+
+
+		}
 
 void service_Beacon_mode(int decoded_signals) {
 	int receive_status;

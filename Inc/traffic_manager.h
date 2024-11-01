@@ -10,6 +10,7 @@
 
 extern int CQ_State;
 extern int Beacon_State;
+extern int stop_QSO_reply;
 
 void service_QSO_mode(int decoded_signals, int message_touch);
 void service_Beacon_mode(int decoded_signals);

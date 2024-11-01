@@ -21,6 +21,8 @@ void write_ADIF_Log(void) {
 	make_Real_Time();
 	make_Real_Date();
 
+	sprintf(display_frequency,"%s",sBand_Data[BandIndex].display);
+
 	sprintf(log_line,
 			"<call:7>%7s<gridsquare:4>%4s<mode:3>FT8<qso_date:8>%8s <time_on:6>%6s<freq:9>%9s<station_callsign:7>%7s<my_gridsquare:4>%4s <eor>",
 			Target_Call, Target_Locator, log_rtc_date_string,
