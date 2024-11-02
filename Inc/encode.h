@@ -28,4 +28,3 @@ uint16_t crc(uint8_t *message, int num_bits);
 void set_cq(void);
 
 #endif // ENCODE_H_
-

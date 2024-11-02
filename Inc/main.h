@@ -12,7 +12,7 @@
 
 void HAL_Delay(uint32_t Delay);
 
-#define NoOp  __NOP()
+#define NoOp __NOP()
 
 extern uint32_t current_time, start_time, ft8_time;
 

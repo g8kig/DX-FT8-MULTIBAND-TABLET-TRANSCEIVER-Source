@@ -33,32 +33,32 @@
 #define RTC_line4 160
 #define RTC_line5 190
 
-#define RTC_Sub		10
-#define RTC_Button  100
-#define RTC_Add		180
+#define RTC_Sub 10
+#define RTC_Button 100
+#define RTC_Add 180
 
 typedef struct
 {
-	char* text0;
-	char* text1;
-	char* blank;
-	int   Active;
-	int	  Displayed;
-	int   state;
-    const uint16_t x;
-    const uint16_t y;
-    const uint16_t w;
-    const uint16_t h;
+	char *text0;
+	char *text1;
+	char *blank;
+	int Active;
+	int Displayed;
+	int state;
+	const uint16_t x;
+	const uint16_t y;
+	const uint16_t w;
+	const uint16_t h;
 
 } ButtonStruct;
 
 typedef struct
 {
 	uint16_t Frequency;
-	char* display;
+	char *display;
 } FreqStruct;
 
-extern int Tune_On;  // 0 = Receive, 1 = Xmit Tune Signal
+extern int Tune_On; // 0 = Receive, 1 = Xmit Tune Signal
 extern int Beacon_On;
 extern int Arm_Tune;
 extern int Auto_Sync;
@@ -70,14 +70,14 @@ extern int ADC_DVC_Gain;
 extern int ADC_DVC_Off;
 extern char display_frequency[];
 
-uint16_t testButton(uint16_t x,uint16_t y,uint16_t w,uint16_t h);
+uint16_t testButton(uint16_t x, uint16_t y, uint16_t w, uint16_t h);
 
 void drawButton(uint16_t i);
 void drawMenu(uint16_t i);
 void checkButton(void);
 
-void executeButton (uint16_t index);
-void executeCalibrationButton (uint16_t index);
+void executeButton(uint16_t index);
+void executeCalibrationButton(uint16_t index);
 void PTT_Out_Init(void);
 void Execute_PTT(void);
 void xmit_sequence(void);

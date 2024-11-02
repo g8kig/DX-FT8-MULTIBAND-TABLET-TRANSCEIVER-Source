@@ -15,14 +15,15 @@
 #include "log_file.h"
 #include "button.h"
 
-void write_ADIF_Log(void) {
+void write_ADIF_Log(void)
+{
 
 	static char log_line[LOG_LINE_SIZE];
 
 	make_Real_Time();
 	make_Real_Date();
 
-	sprintf(display_frequency,"%s",sBand_Data[BandIndex].display);
+	sprintf(display_frequency, "%s", sBand_Data[BandIndex].display);
 
 	sprintf(log_line,
 			"<call:7>%7s<gridsquare:4>%4s<mode:3>FT8<qso_date:8>%8s <time_on:6>%6s<freq:9>%9s<station_callsign:7>%7s<my_gridsquare:4>%4s <eor>",
@@ -31,4 +32,3 @@ void write_ADIF_Log(void) {
 
 	Write_Log_Data(log_line);
 }
-

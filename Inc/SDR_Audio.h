@@ -11,7 +11,7 @@
 
 #define BUFFERSIZE 1280 * 4
 
-#define NoOp  __NOP()
+#define NoOp __NOP()
 
 extern q15_t FIR_I_In[BUFFERSIZE / 4];
 extern q15_t FIR_Q_In[BUFFERSIZE / 4];

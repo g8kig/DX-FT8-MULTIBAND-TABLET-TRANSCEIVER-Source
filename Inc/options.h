@@ -9,7 +9,8 @@
 #define OPTIONS_H_
 #include <stdint.h>
 
-typedef struct {
+typedef struct
+{
 	const char *Name;
 	const int16_t Initial;
 	const int16_t Minimum;
@@ -18,8 +19,10 @@ typedef struct {
 	int16_t CurrentValue;
 } OptionStruct;
 
-typedef enum {
-	OPTION_Band_Index, NUM_OPTIONS
+typedef enum
+{
+	OPTION_Band_Index,
+	NUM_OPTIONS
 } OptionNumber;
 
 // Work with option data

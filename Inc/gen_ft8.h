@@ -13,11 +13,11 @@
 #include "defines.h"
 
 extern char Target_Frequency[FREQUENCY_SIZE]; // Seven character frequency  + /0
-extern char Locator[LOCATOR_SIZE]; // four character locator  + /0
-extern char Station_Call[CALL_SIZE]; //six character call sign + /0
-extern char Target_Call[CALL_SIZE]; //six character call sign + /0
-extern char Target_Locator[LOCATOR_SIZE]; // four character locator  + /0
-extern int Target_RSL; // four character RSL  + /0
+extern char Locator[LOCATOR_SIZE];            // four character locator  + /0
+extern char Station_Call[CALL_SIZE];          // six character call sign + /0
+extern char Target_Call[CALL_SIZE];           // six character call sign + /0
+extern char Target_Locator[LOCATOR_SIZE];     // four character locator  + /0
+extern int Target_RSL;                        // four character RSL  + /0
 extern char CQ_Target_Call[CALL_SIZE];
 
 extern char SDPath[4]; /* SD card logical drive path */

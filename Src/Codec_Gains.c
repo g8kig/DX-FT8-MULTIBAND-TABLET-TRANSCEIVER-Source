@@ -26,18 +26,20 @@
 
 #define Codec_Pause 1
 
-void Set_HP_Gain(int HP_gain) {
+void Set_HP_Gain(int HP_gain)
+{
 
 	if (HP_gain > HP_GAIN_MAX)
 		HP_gain = HP_GAIN_MAX;
 	if (HP_gain < HP_GAIN_MIN)
 		HP_gain = HP_GAIN_MIN;
 
-	AUDIO_IO_Write(AUDIO_I2C_ADDRESS, 0x001C, HP_gain + 64);  //headphone volume
-	AUDIO_IO_Write(AUDIO_I2C_ADDRESS, 0x001D, HP_gain + 320); //headphone volume
-}   // End of Set_HP_Gain
+	AUDIO_IO_Write(AUDIO_I2C_ADDRESS, 0x001C, HP_gain + 64);  // headphone volume
+	AUDIO_IO_Write(AUDIO_I2C_ADDRESS, 0x001D, HP_gain + 320); // headphone volume
+} // End of Set_HP_Gain
 
-void Set_PGA_Gain(int PGA_gain) {
+void Set_PGA_Gain(int PGA_gain)
+{
 
 	if (PGA_gain < PGA_GAIN_MIN)
 		PGA_gain = PGA_GAIN_MIN;
@@ -49,9 +51,9 @@ void Set_PGA_Gain(int PGA_gain) {
 
 	AUDIO_IO_Write(AUDIO_I2C_ADDRESS, 0x001A, PGA_gain + 256);
 	HAL_Delay(1);
-}   // End of Set_PGA_gain
+} // End of Set_PGA_gain
 
-void Set_ADC_DVC(int ADC_gain)  // gain in 0.375 dB steps
+void Set_ADC_DVC(int ADC_gain) // gain in 0.375 dB steps
 {
 
 	if (ADC_gain > ADC_GAIN_MAX)
@@ -65,4 +67,4 @@ void Set_ADC_DVC(int ADC_gain)  // gain in 0.375 dB steps
 	AUDIO_IO_Write(AUDIO_I2C_ADDRESS, 0x401, ADC_gain + 256);
 	HAL_Delay(1);
 
-}   // End of Set_ADC_DVC
+} // End of Set_ADC_DVC
