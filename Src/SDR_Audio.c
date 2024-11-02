@@ -29,7 +29,6 @@ q15_t out_buff[BUFFERSIZE];
 
 uint16_t buff_offset;
 
-//float R_lgain;
 float x_NCOphzinc;
 
 int DSP_Flag;

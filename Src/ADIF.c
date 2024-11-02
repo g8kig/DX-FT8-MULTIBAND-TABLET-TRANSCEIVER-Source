@@ -4,6 +4,7 @@
  *  Created on: Jun 18, 2023
  *      Author: Charley
  */
+#include "defines.h"
 #include "ADIF.h"
 #include "gen_ft8.h"
 #include "DS3231.h"
@@ -16,7 +17,7 @@
 
 void write_ADIF_Log(void) {
 
-	static char log_line[180];
+	static char log_line[LOG_LINE_SIZE];
 
 	make_Real_Time();
 	make_Real_Date();

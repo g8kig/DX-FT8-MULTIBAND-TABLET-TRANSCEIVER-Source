@@ -958,7 +958,7 @@ void set_clock_fanout(enum si5351_clock_fanout fanout, uint8_t enable) {
 		}
 		break;
 	case SI5351_FANOUT_MS:
-s		if (enable) {
+		if (enable) {
 			reg_val |= SI5351_MULTISYNTH_ENABLE;
 		} else {
 			reg_val &= ~(SI5351_MULTISYNTH_ENABLE);

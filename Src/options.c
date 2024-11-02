@@ -1,4 +1,5 @@
 #include <Display.h>
+#include "defines.h"
 #include "options.h"
 #include "SDR_Audio.h"
 #include "Codec_Gains.h"
@@ -26,7 +27,7 @@
 /* Fatfs structure */
 FATFS SDFatFs; /* File system object for SD card logical drive */
 FIL MyFile; /* File object */
-char SDPath[4]; /* SD card logical drive path */
+char SDPath[SD_PATH_SIZE]; /* SD card logical drive path */
 
 // Order must match OptionNumber in options.h
 OptionStruct s_optionsData[] = { {
@@ -101,11 +102,8 @@ void Options_StoreValue(int optionIdx) {
 //Routine to write a integer value to the MicroSD starting at MicroSD address MicroSD_Addr
 void Write_Int_MicroSD(uint16_t DiskBlock, int16_t value) {
 
-	uint8_t i;
-	char read_buffer[132];
+	char read_buffer[BUFFER_SIZE] = {0};
 
-	for (i = 0; i < 32; i++)
-		read_buffer[i] = 0;
 	f_mount(&SDFatFs, SDPath, 1);
 	f_open(&MyFile, "SaveParams.txt", FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
 	HAL_Delay(1);
@@ -118,11 +116,8 @@ void Write_Int_MicroSD(uint16_t DiskBlock, int16_t value) {
 
 int16_t Read_Int_MicroSD(uint16_t DiskBlock) {
 	int16_t result = 0;
-	uint8_t i;
-	char read_buffer[132];
+	char read_buffer[BUFFER_SIZE];
 
-	for (i = 0; i < 32; i++)
-		read_buffer[i] = 0;
 	f_mount(&SDFatFs, SDPath, 1);
 	f_open(&MyFile, "SaveParams.txt", FA_READ);
 	f_lseek(&MyFile, DiskBlock * 32);

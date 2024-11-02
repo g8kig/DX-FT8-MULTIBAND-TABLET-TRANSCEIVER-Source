@@ -6,6 +6,7 @@
  */
 
 #include <Display.h>
+#include "defines.h"
 #include <stdlib.h>
 #include "button.h"
 #include "stm32746g_discovery_lcd.h"
@@ -37,34 +38,24 @@ int ADC_DVC_Off = 90;
 
 extern int Auto_QSO_State;
 
-char display_frequency[] = "14.075";
+char display_frequency[FREQUENCY_SIZE] = "14.075";
 
-//extern uint16_t refClock;
-
-#define numBands 5
-
-FreqStruct sBand_Data[] = { 
+FreqStruct sBand_Data[NUM_BANDS] = { 
 	    {  //20,
 		14074, "14.075" },
-
 		{  //17,
 		18100, "18.101" },
-
 		{  //15,
 		21074, "21.075" },
-
 		{  //12,
 		24915, "24.916"
-
 		},
-
 		{  //10,
-		28074, "28.075" } };
+		28074, "28.075" 
+		} 
+};
 
-#define numButtons 28
-
-ButtonStruct sButtonData[] = {
-
+ButtonStruct sButtonData[NUM_BUTTONS] = {
 {	//button 0  inhibit xmit either as beacon or answer CQ
 		/*text0*/"Clr ",
 		/*text1*/"Clr ",
@@ -458,13 +449,12 @@ void drawButton(uint16_t i) {
 void checkButton(void) {
 	uint16_t i;
 
-	for (i = 0; i < numButtons; i++) {
+	for (i = 0; i < NUM_BUTTONS; i++) {
 
 		if (testButton(sButtonData[i].x, sButtonData[i].y, sButtonData[i].w,
 				sButtonData[i].h) == 1) {
 
 			switch (sButtonData[i].Active) {
-
 			case 0:
 				break;
 
@@ -481,7 +471,6 @@ void checkButton(void) {
 			case 3:
 				executeCalibrationButton(i);
 				break;
-
 			}
 		}
 	}
@@ -655,7 +644,7 @@ void executeCalibrationButton(uint16_t index) {
 		break;
 
 	case 11:  //Raise Band
-		if (BandIndex < numBands - 1) {
+		if (BandIndex < NUM_BANDS - 1) {
 			BandIndex++;
 			show_wide(340, 60, sBand_Data[BandIndex].Frequency);
 			sprintf(display_frequency, "%s", sBand_Data[BandIndex].display);

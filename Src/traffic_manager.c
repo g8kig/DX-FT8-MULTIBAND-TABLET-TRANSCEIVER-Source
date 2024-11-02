@@ -22,12 +22,10 @@
 int CQ_State;
 int Beacon_State;
 
-
 int Auto_QSO_State;
 int QSO_xmit_count;
 int CQ_State;
 int stop_QSO_reply;
-
 
 void service_QSO_mode(int decoded_signals, int message_touch){
 
@@ -72,8 +70,6 @@ void service_QSO_mode(int decoded_signals, int message_touch){
 			Auto_QSO_State = 0;
 			stop_QSO_reply = 1;
 		break;
-
-
 	}
 }
 
@@ -104,7 +100,6 @@ void service_Beacon_mode(int decoded_signals) {
 		}
 		Beacon_State = 1;
 		break;
-
 	}
 
 }  //end of service_Beacon_mode

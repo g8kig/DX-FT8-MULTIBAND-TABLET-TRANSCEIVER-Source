@@ -12,34 +12,34 @@ extern int num_CQ_calls;
 extern int num_calls_to_CQ_station;
 
 typedef struct {
-    char field1[14];
-    char field2[14];
-    char field3[7];
+    char field1[FIELD1_SIZE];
+    char field2[FIELD2_SIZE];
+    char field3[FIELD3_SIZE];
     int  freq_hz;
     int  sync_score;
     int  snr;
-    char target[5];
+    char target[LOCATOR_SIZE];
     int  slot;
 } Decode;
 
 typedef struct {
-	char message[20];
+	char message[MESSAGE_SIZE];
 	int text_color;
 } display_message;
 
 typedef struct {
 
 	int number_times_called;
-	char call[7];
-	char locator[4];
+	char call[FIELD2_SIZE];
+	char locator[LOCATOR_SIZE];
 	int RSL;
 	int RR73;
 
 } Calling_Station;
 
 typedef struct {
-	char decode_time[10];
-	char call[7];
+	char decode_time[DECODE_TIME_SIZE];
+	char call[CALL_SIZE];
 	int distance;
 	int snr;
 	int freq_hz;

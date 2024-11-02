@@ -29,8 +29,8 @@ int FT_8_TouchIndex;
 int FT_8_MessageIndex;
 
 uint16_t cursor;
-char rtc_date_string[9];
-char rtc_time_string[9];
+char rtc_date_string[DATE_STRING_SIZE];
+char rtc_time_string[TIME_STRING_SIZE];
 int decode_flag;
 int FT8_Touch_Flag;
 int FT8_Message_Touch;
@@ -49,29 +49,28 @@ uint8_t test;
 int count;
 double Touch_Frequency;
 
-char current_QSO_receive_message[];
-char current_QSO_xmit_message[];
+char current_QSO_receive_message[MESSAGE_SIZE];
+char current_QSO_xmit_message[MESSAGE_SIZE];
 
-int max_log_messages = 8;
-display_message log_messages[8];
+display_message log_messages[LOG_MESSAGE_COUNT];
 
 void update_log_display(int mode) {
 
-	for (int i = 0; i < max_log_messages - 1; i++) {
+	for (int i = 0; i < LOG_MESSAGE_COUNT - 1; i++) {
 		strcpy(log_messages[i].message, log_messages[i + 1].message);
 		log_messages[i].text_color = log_messages[i + 1].text_color;
 	}
 
 	if (mode == 0) {
-		strcpy(log_messages[max_log_messages - 1].message,
+		strcpy(log_messages[LOG_MESSAGE_COUNT - 1].message,
 				current_QSO_receive_message);
-		log_messages[max_log_messages - 1].text_color = 0;
+		log_messages[LOG_MESSAGE_COUNT - 1].text_color = 0;
 	}
-
+	else
 	if (mode == 1) {
-		strcpy(log_messages[max_log_messages - 1].message,
+		strcpy(log_messages[LOG_MESSAGE_COUNT - 1].message,
 				current_QSO_xmit_message);
-		log_messages[max_log_messages - 1].text_color = 1;
+		log_messages[LOG_MESSAGE_COUNT - 1].text_color = 1;
 	}
 
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
@@ -79,34 +78,34 @@ void update_log_display(int mode) {
 
 	BSP_LCD_SetFont(&Font16);
 
-	for (int i = 0; i < max_log_messages; i++) {
+	for (int i = 0; i < LOG_MESSAGE_COUNT; i++) {
 
 		if (log_messages[i].text_color == 0)
 			BSP_LCD_SetTextColor(LCD_COLOR_RED);
+		else
 		if (log_messages[i].text_color == 1)
 			BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
 
-		BSP_LCD_DisplayStringAt(240, 40 + i * 20,
-				(const uint8_t*) log_messages[i].message, LEFT_MODE);
+		BSP_LCD_DisplayStringAt(240, 40 + i * 20, (const uint8_t*) log_messages[i].message, LEFT_MODE);
 	}
-
 }
 
 void clear_log_messages(void){
 
 	char blank[] = "                    ";
 
-	for (int i = 0; i<max_log_messages; i++ ) 	strcpy(log_messages[i].message , blank);
+	for (int i = 0; i<LOG_MESSAGE_COUNT; i++ ) 	
+		strcpy(log_messages[i].message , blank);
 }
 
-char current_Beacon_receive_message[40];
-char current_Beacon_xmit_message[40];
-int max_Beacon_log_messages = 10;
-display_message Beacon_log_messages[10];
+char current_Beacon_receive_message[MESSAGE_SIZE];
+char current_Beacon_xmit_message[MESSAGE_SIZE];
+
+display_message Beacon_log_messages[BEACON_MESSAGE_COUNT];
 
 void update_Beacon_log_display(int mode) {
 
-	for (int i = 0; i < max_Beacon_log_messages - 1; i++) {
+	for (int i = 0; i < BEACON_MESSAGE_COUNT - 1; i++) {
 		strcpy(Beacon_log_messages[i].message,
 				Beacon_log_messages[i + 1].message);
 		Beacon_log_messages[i].text_color =
@@ -114,30 +113,29 @@ void update_Beacon_log_display(int mode) {
 	}
 
 	if (mode == 0) {
-		strcpy(Beacon_log_messages[max_Beacon_log_messages - 1].message,
+		strcpy(Beacon_log_messages[BEACON_MESSAGE_COUNT - 1].message,
 				current_Beacon_receive_message);
-		Beacon_log_messages[max_Beacon_log_messages - 1].text_color = 0;
+		Beacon_log_messages[BEACON_MESSAGE_COUNT - 1].text_color = 0;
 	}
-
+	else
 	if (mode == 1) {
-		strcpy(Beacon_log_messages[max_Beacon_log_messages - 1].message,
+		strcpy(Beacon_log_messages[BEACON_MESSAGE_COUNT - 1].message,
 				current_Beacon_xmit_message);
-		Beacon_log_messages[max_Beacon_log_messages - 1].text_color = 1;
+		Beacon_log_messages[BEACON_MESSAGE_COUNT - 1].text_color = 1;
 	}
 
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 	BSP_LCD_FillRect(240, 40, 240, 200);
 	BSP_LCD_SetFont(&Font16);
 
-	for (int i = 0; i < max_Beacon_log_messages; i++) {
+	for (int i = 0; i < BEACON_MESSAGE_COUNT; i++) {
 
 		if (Beacon_log_messages[i].text_color == 0)
 			BSP_LCD_SetTextColor(LCD_COLOR_RED);
 		if (Beacon_log_messages[i].text_color == 1)
 			BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
 
-		BSP_LCD_DisplayStringAt(240, 40 + i * 20,
-				(const uint8_t*) Beacon_log_messages[i].message, LEFT_MODE);
+		BSP_LCD_DisplayStringAt(240, 40 + i * 20, (const uint8_t*) Beacon_log_messages[i].message, LEFT_MODE);
 	}
 
 }
@@ -146,7 +144,8 @@ void clear_Beacon_log_messages(void){
 
 	char blank[] = "                    ";
 
-	for (int i = 0; i<max_Beacon_log_messages; i++ ) strcpy(Beacon_log_messages[i].message , blank);
+	for (int i = 0; i < BEACON_MESSAGE_COUNT; i++ )
+		strcpy(Beacon_log_messages[i].message , blank);
 
 }
 
@@ -176,12 +175,12 @@ void show_short(uint16_t x, uint16_t y, uint8_t variable) {
 
 void show_UTC_time(uint16_t x, uint16_t y, int utc_hours, int utc_minutes,
 		int utc_seconds, int color) {
-	sprintf(rtc_time_string, "%02i:%02i:%02i", utc_hours, utc_minutes,
-			utc_seconds);
+	sprintf(rtc_time_string, "%02i:%02i:%02i", utc_hours, utc_minutes, utc_seconds);
 	BSP_LCD_SetFont(&Font16);
 
 	if (color == 0)
 		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+	else
 	if (color == 1)
 		BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
 
@@ -206,7 +205,7 @@ void setup_display(void) {
     BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
     BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
 
-    BSP_LCD_DisplayStringAt(0, 100, "DX FT8 Version: V1.1", LEFT_MODE);
+    BSP_LCD_DisplayStringAt(0, 100, (const uint8_t*) "DX FT8 Version: V1.1", LEFT_MODE);
 
 	drawButton(0);
 	drawButton(1);
@@ -258,13 +257,10 @@ void Process_Touch(void) {
 
 uint16_t FFT_Touch(void) {
 
-	// if  ((valx > FFT_X  && valx < FFT_X + FFT_W/2 ) && (valy > FFT_Y && valy < FFT_Y + 2 * FFT_H))
-	//if ((valx > FFT_X && valx < FFT_X + FFT_W / 2) 			&& (valy > FFT_Y && valy < 30))
-
 	if  ((valx > FFT_X  && valx < FFT_X + FFT_W ) && (valy > FFT_Y && valy < 30))
 		return 1;
-	else
-		return 0;
+
+	return 0;
 }
 
 int FT8_Touch(void) {
@@ -277,49 +273,38 @@ int FT8_Touch(void) {
 
 		return 1;
 	}
-
-	else
-		return 0;
+	return 0;
 }
 
 int Xmit_message_Touch(void) {
-
-	int y_test;
 	if ((valx > 240 && valx < 480) && (valy > 160 && valy < 240)) {
-		y_test = valy - 160;
+		int y_test = valy - 160;
 
 		FT_8_MessageIndex = y_test / 20;
 
 		return 1;
 	}
-
-	else
-		return 0;
+	return 0;
 }
 
 int Xmit_QSO_Message(void) {
-
-	  if  ((valx > 240  && valx < 480 ) && (valy > 140 && valy < 160)){
-
-	  return 1;
-  }
-	  else
-	  return 0;
+	if  ((valx > 240  && valx < 480 ) && (valy > 140 && valy < 160))
+	{
+		return 1;
+  	}
+	return 0;
 }
 
 void Init_Waterfall(void) {
-
 	pWFBfr = &WF_Bfr[0];
 	WF_Count = 0;
 	WF_Line0 = FFT_H - 1;
-
 }
 
 int null_count, FFT_Line_Delay;
 
 void Display_WF(void) {
-
-	if(ft8_marker ==1) {
+	if(ft8_marker == 1) {
 
 			for (int x = 0; x < (FFT_W ); x++) *(pWFBfr + (FFT_W*WF_Line0) + x) = 63;
 			ft8_marker = 0;
@@ -354,7 +339,8 @@ void Display_WF(void) {
 			if (Auto_Sync) {
 			for (int x = 0; x < ft8_buffer -ft8_min_bin; x++){
 
-				if ((*(pWFBfr + 39*FFT_W + x))  > 0) null_count++;
+				if ((*(pWFBfr + 39*FFT_W + x))  > 0) 
+					null_count++;
 
 			}
 
@@ -375,4 +361,3 @@ void Display_WF(void) {
 	BSP_LCD_SetTextColor(LCD_COLOR_RED);
 	BSP_LCD_DrawLine(FFT_X+ cursor,FFT_H,FFT_X+cursor,0);
 }
-

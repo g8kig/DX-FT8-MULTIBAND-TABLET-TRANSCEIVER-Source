@@ -307,8 +307,7 @@ int unpack_nonstandard(const uint8_t *a77, char *field1, char *field2,
 	return 0;
 }
 
-int unpack77_fields(const uint8_t *a77, char *field1, char *field2,
-		char *field3) {
+int unpack77_fields(const uint8_t *a77, char *field1, char *field2, char *field3) {
 	uint8_t n3, i3;
 
 	// Extract n3 (bits 71..73) and i3 (bits 74..76)

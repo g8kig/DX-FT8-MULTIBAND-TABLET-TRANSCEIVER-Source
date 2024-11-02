@@ -8,7 +8,8 @@
 #ifndef DISPLAY_H_
 #define DISPLAY_H_
 
-#include	"arm_math.h"
+#include "arm_math.h"
+#include "defines.h"
 
 #define FFT_H  40
 
@@ -18,8 +19,8 @@ extern int FT_8_TouchIndex;
 extern int FT_8_MessageIndex;
 
 extern uint16_t cursor;
-extern char rtc_date_string[9];
-extern char rtc_time_string[9];
+extern char rtc_date_string[DATE_STRING_SIZE];
+extern char rtc_time_string[TIME_STRING_SIZE];
 extern int decode_flag;
 extern int FT8_Touch_Flag;
 extern int FT8_Message_Touch;
@@ -27,13 +28,10 @@ extern int FT8_Message_Touch;
 extern int QSO_Xmit_Touch;
 extern int Xmit_QSO_Message(void);
 
-
-
-extern char current_QSO_receive_message[40];
-extern char current_Beacon_receive_message[40];
-extern char current_Beacon_xmit_message[40];
-extern char current_QSO_xmit_message[40];
-
+extern char current_QSO_receive_message[MESSAGE_SIZE];
+extern char current_Beacon_receive_message[MESSAGE_SIZE];
+extern char current_Beacon_xmit_message[MESSAGE_SIZE];
+extern char current_QSO_xmit_message[MESSAGE_SIZE];
 
 extern uint16_t valx, valy;
 

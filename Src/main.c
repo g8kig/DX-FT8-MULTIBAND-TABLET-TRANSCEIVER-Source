@@ -161,24 +161,17 @@ int main(void) {
 								clear_qued_message();
 						}
 					}
-
 					else {
 						ft8_shift = 0;
 					}
-
 				}
-
 				else
-
 				{
-
 					ft8_xmit_delay++;
 
 					if (ft8_xmit_delay == 16)
 						output_enable(SI5351_CLK0, 1);
-
 				}
-
 			}
 
 			display_RealTime(100, 240);

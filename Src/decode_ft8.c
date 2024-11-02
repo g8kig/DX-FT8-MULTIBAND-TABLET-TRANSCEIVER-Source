@@ -11,8 +11,9 @@
 #include <math.h>
 #include <ctype.h>
 #include <Display.h>
-#include <gen_ft8.h>
 
+#include "defines.h"
+#include "gen_ft8.h"
 #include "unpack.h"
 #include "ldpc.h"
 #include "decode.h"
@@ -30,35 +31,30 @@
 #include "DS3231.h"
 
 const int kLDPC_iterations = 20;
-const int kMax_candidates = 20;
-const int kMax_decoded_messages = 20;  //chhh 27 feb
-const int kMax_message_length = 20;
 const int kMin_score = 40;		// Minimum sync score threshold for candidates
 
 static int validate_locator(const char locator[]);
 static int strindex(const char s[], const char t[]);
 
-static Decode new_decoded[20];  //chh 27 Feb
-extern char current_QSO_receive_message[];
-extern char current_Beacon_receive_message[];
+static Decode new_decoded[DECODED_MESSAGE_COUNT];  //chh 27 Feb
+extern char current_QSO_receive_message[MESSAGE_SIZE];
+extern char current_Beacon_receive_message[MESSAGE_SIZE];
 
-static display_message display[10];
+static display_message display[DISPLAY_MESSAGE_COUNT];
 
-static Calling_Station Answer_CQ[50];  //
-static int log_size = 50;
+static Calling_Station Answer_CQ[ANSWER_CQ_COUNT];  //
 
 static int num_calls;  // number of unique calling stations
-static int message_limit = 10;
 
 int ft8_decode(void) {
 
 	// Find top candidates by Costas sync score and localize them in time and frequency
-	Candidate candidate_list[kMax_candidates];
+	Candidate candidate_list[CANDIDATE_COUNT];
 
 	int num_candidates = find_sync(export_fft_power, ft8_msg_samples,
-			ft8_buffer, kCostas_map, kMax_candidates, candidate_list,
+			ft8_buffer, kCostas_map, CANDIDATE_COUNT, candidate_list,
 			kMin_score);
-	char decoded[kMax_decoded_messages][kMax_message_length];
+	char decoded[DECODED_MESSAGE_COUNT][MESSAGE_SIZE];
 
 	const float fsk_dev = 6.25f;    // tone deviation in Hz and symbol rate
 
@@ -97,11 +93,11 @@ int ft8_decode(void) {
 		if (chksum != chksum2)
 			continue;
 
-		char message[14+14+7+1];
+		char message[MESSAGE_SIZE];
 
-		char field1[14];
-		char field2[14];
-		char field3[7];
+		char field1[FIELD1_SIZE];
+		char field2[FIELD2_SIZE];
+		char field3[FIELD3_SIZE];
 		int rc = unpack77_fields(a91, field1, field2, field3);
 		if (rc < 0)
 			continue;
@@ -120,8 +116,8 @@ int ft8_decode(void) {
 		float raw_RSL;
 		int display_RSL;
 
-		if (!found && num_decoded < kMax_decoded_messages) {
-			if (strlen(message) < kMax_message_length) {
+		if (!found && num_decoded < DECODED_MESSAGE_COUNT) {
+			if (strlen(message) < MESSAGE_SIZE) {
 				strcpy(decoded[num_decoded], message);
 
 				new_decoded[num_decoded].sync_score = cand.score;
@@ -144,7 +140,6 @@ int ft8_decode(void) {
 				}
 
 				++num_decoded;
-
 			}
 		}
 	}  //End of big decode loop
@@ -160,7 +155,7 @@ void display_messages(int decoded_messages) {
 	BSP_LCD_FillRect(0, FFT_H, 240, 200);
 	BSP_LCD_SetFont(&Font16);
 
-	for (int i = 0; i < decoded_messages && i < message_limit; i++) {
+	for (int i = 0; i < decoded_messages && i < DECODED_MESSAGE_COUNT; i++) {
 		const char *field1 = new_decoded[i].field1;
 		const char *field2 = new_decoded[i].field2;
 		const char *field3 = new_decoded[i].field3;
@@ -173,14 +168,13 @@ void display_messages(int decoded_messages) {
 			display[i].text_color = 0;
 	}
 
-	for (int j = 0; j < decoded_messages && j < message_limit; j++) {
+	for (int j = 0; j < decoded_messages && j < DECODED_MESSAGE_COUNT; j++) {
 		if (display[j].text_color == 0)
 			BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 		else
 			BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-		BSP_LCD_DisplayStringAt(0, 40 + j * 20,
-				(const uint8_t*) display[j].message, 0x03);
 
+		BSP_LCD_DisplayStringAt(0, 40 + j * 20, (const uint8_t*) display[j].message, LEFT_MODE);
 	}
 }
 
@@ -210,8 +204,7 @@ static int validate_locator(const char locator[]) {
 
 	if (test == 4)
 		return 1;
-	else
-		return 0;
+	return 0;
 }
 
 void clear_log_stored_data(void) {
@@ -219,7 +212,7 @@ void clear_log_stored_data(void) {
 	const char call_blank[] = "       ";
 	const char locator_blank[] = "    ";
 
-	for (int i = 0; i < log_size; i++) {
+	for (int i = 0; i < ANSWER_CQ_COUNT; i++) {
 		Answer_CQ[i].number_times_called = 0;
 		strcpy(Answer_CQ[i].call, call_blank);
 		strcpy(Answer_CQ[i].locator, locator_blank);
@@ -240,10 +233,9 @@ int Check_Calling_Stations(int num_decoded, int reply_state) {
 			old_call = 0;
 
 			for (int j = 0; j < num_calls; j++) {
-				if (strcmp(Answer_CQ[j].call, new_decoded[i].field2) == 0) {
-					old_call = Answer_CQ[j].number_times_called;
-					old_call++;
-					Answer_CQ[j].number_times_called = old_call;
+				Calling_Station *s = &Answer_CQ[j]; 
+				if (strcmp(s->call, new_decoded[i].field2) == 0) {
+					old_call = ++s->number_times_called;
 					old_call_address = j;
 				}
 
@@ -257,20 +249,24 @@ int Check_Calling_Stations(int num_decoded, int reply_state) {
 				sprintf(current_Beacon_receive_message, " %s %s %s", field1, field2, field3);
 				sprintf(current_QSO_receive_message, " %s %s %s", field1, field2, field3);
 
-			   // update_Beacon_log_display(0);
-				if(Beacon_On == 1) update_Beacon_log_display(0);
-				if(Beacon_On == 0) update_log_display(0);
+				if(Beacon_On == 1)
+					update_Beacon_log_display(0);
+				else if(Beacon_On == 0)
+					update_log_display(0);
 
-				strcpy(Target_Call, field2);
+				memcpy(Target_Call, field2, CALL_SIZE);
+				Target_Call[CALL_SIZE-1] = 0;
 				Target_RSL = new_decoded[i].snr;
 
-				if (Beacon_On == 1)set_reply(0);
+				if (Beacon_On == 1)
+					set_reply(0);
 
 				Beacon_Reply_Status = 1;
 
-				strcpy(Answer_CQ[num_calls].call, field2);
-				strcpy(Answer_CQ[num_calls].locator, new_decoded[i].target);
-				Answer_CQ[num_calls].RSL = Target_RSL;
+				Calling_Station *s = &Answer_CQ[num_calls];
+				strcpy(s->call, new_decoded[i].field2);
+				strcpy(s->locator, new_decoded[i].target);
+				s->RSL = Target_RSL;
 
 				num_calls++;
 
@@ -283,26 +279,27 @@ int Check_Calling_Stations(int num_decoded, int reply_state) {
 				sprintf(current_Beacon_receive_message, " %s %s %s", field1, field2, field3);
 				sprintf(current_QSO_receive_message, " %s %s %s", field1, field2, field3);
 
-			    if (Beacon_On == 1) update_Beacon_log_display(0);
-			    if(Beacon_On == 0) update_log_display(0);
+			    if (Beacon_On == 1)
+			    	update_Beacon_log_display(0);
+			    else if (Beacon_On == 0)
+			    	update_log_display(0);
 
 				if (Answer_CQ[old_call_address].RR73 == 0) {
 
-					strcpy(Target_Call, Answer_CQ[old_call_address].call);
+					memcpy(Target_Call, Answer_CQ[old_call_address].call, CALL_SIZE);
+					Target_Call[CALL_SIZE-1] = 0;
 					strcpy(Target_Locator, Answer_CQ[old_call_address].locator);
-
 					Target_RSL = Answer_CQ[old_call_address].RSL;
 
-					if (Beacon_On == 1) set_reply(1);
+					if (Beacon_On == 1)
+						set_reply(1);
 
 					Answer_CQ[old_call_address].RR73 = 1;
 
 					Beacon_Reply_Status = 1;
-
 				}
 				else
-
-				Beacon_Reply_Status = 0;
+					Beacon_Reply_Status = 0;
 
 			}
 		}   //check for station call
@@ -315,18 +312,20 @@ int Check_Calling_Stations(int num_decoded, int reply_state) {
 
 void process_selected_Station(int stations_decoded, int TouchIndex) {
 
-	if(stations_decoded > 0 && TouchIndex <= stations_decoded ){
-	strcpy(Target_Call, new_decoded[TouchIndex].field2);
-	strcpy(Target_Locator, new_decoded[TouchIndex].target);
-	Target_RSL = new_decoded[TouchIndex].snr;
-	target_slot = new_decoded[TouchIndex].slot;
-	target_freq = new_decoded[TouchIndex].freq_hz;
-	set_QSO_Xmit_Freq(target_freq);
+	if(stations_decoded > 0 && TouchIndex <= stations_decoded )
+	{
+		memcpy(Target_Call, new_decoded[TouchIndex].field2, CALL_SIZE);
+		Target_Call[CALL_SIZE-1] = 0;
 
-	compose_messages();
-	Auto_QSO_State = 1;
-	stop_QSO_reply = 0;
+		strcpy(Target_Locator, new_decoded[TouchIndex].target);
+		Target_RSL = new_decoded[TouchIndex].snr;
+		target_slot = new_decoded[TouchIndex].slot;
+		target_freq = new_decoded[TouchIndex].freq_hz;
+		set_QSO_Xmit_Freq(target_freq);
 
+		compose_messages();
+		Auto_QSO_State = 1;
+		stop_QSO_reply = 0;
 	}
 
 	FT8_Touch_Flag = 0;
@@ -336,7 +335,7 @@ void process_selected_Station(int stations_decoded, int TouchIndex) {
 void set_QSO_Xmit_Freq(int freq) {
 
 	freq = freq - ft8_min_freq;
-	cursor = (uint16_t) ( (float)freq / FFT_Resolution);
+	cursor = (uint16_t) ( (float) freq / FFT_Resolution);
 
 	Set_Cursor_Frequency();
 	show_variable(400, 25,(int)  NCO_Frequency );
