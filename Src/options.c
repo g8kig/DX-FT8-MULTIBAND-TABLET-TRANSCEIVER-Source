@@ -66,7 +66,7 @@ void Options_Initialize(void) {
 
 	start_freq = sBand_Data[BandIndex].Frequency;
 
-	show_wide(380, 0, (int) start_freq);
+	show_wide(380, 0, start_freq);
 }
 
 void Options_ResetToDefaults(void) {

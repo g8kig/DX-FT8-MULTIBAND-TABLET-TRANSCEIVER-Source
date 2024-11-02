@@ -105,7 +105,6 @@ int ft8_decode(void) {
 		sprintf(message, "%s %s %s ", field1, field2, field3);
 
 		_Bool found = false;
-
 		for (int i = 0; i < num_decoded; ++i) {
 			if (0 == strcmp(decoded[i], message)) {
 				found = true;
@@ -113,37 +112,35 @@ int ft8_decode(void) {
 			}
 		}
 
-		float raw_RSL;
-		int display_RSL;
-
 		if (!found && num_decoded < DECODED_MESSAGE_COUNT) {
-			if (strlen(message) < MESSAGE_SIZE) {
-				strcpy(decoded[num_decoded], message);
+			if (strlen(field1) >= CALL_SIZE)
+				continue;
+			if (strlen(field2) >= CALL_SIZE)
+				continue;
+			if (strlen(field3) >= LOCATOR_SIZE)
+				continue;
 
-				new_decoded[num_decoded].sync_score = cand.score;
-				new_decoded[num_decoded].freq_hz = (int) freq_hz;
+			strcpy(decoded[num_decoded], message);
 
-				strcpy(new_decoded[num_decoded].field1, field1);
-				strcpy(new_decoded[num_decoded].field2, field2);
-				strcpy(new_decoded[num_decoded].field3, field3);
+			new_decoded[num_decoded].sync_score = cand.score;
+			new_decoded[num_decoded].freq_hz = (int) freq_hz;
 
-				new_decoded[num_decoded].slot = slot_state;
+			strcpy(new_decoded[num_decoded].field1, field1);
+			strcpy(new_decoded[num_decoded].field2, field2);
+			strcpy(new_decoded[num_decoded].field3, field3);
 
-				raw_RSL = (float) new_decoded[num_decoded].sync_score;
-				display_RSL = (int) ((raw_RSL - 160)) / 6;
-				new_decoded[num_decoded].snr = display_RSL;
+			new_decoded[num_decoded].slot = slot_state;
+			new_decoded[num_decoded].snr = (int) ((new_decoded[num_decoded].sync_score - 160.0f)) / 6.0f;
 
-				if (validate_locator(field3) == 1) {
-					strcpy(new_decoded[num_decoded].target, field3);
-				} else {
-					strcpy(new_decoded[num_decoded].target, "    ");
-				}
-
-				++num_decoded;
+			if (validate_locator(field3) == 1) {
+				strcpy(new_decoded[num_decoded].target, field3);
+			} else {
+				new_decoded[num_decoded].target[0] = 0;
 			}
+
+			++num_decoded;
 		}
 	}  //End of big decode loop
-
 	return num_decoded;
 }
 
@@ -184,14 +181,12 @@ void clear_messages(void) {
 }
 
 static int validate_locator(const char locator[]) {
-
-	uint8_t A1, A2, N1, N2;
 	uint8_t test = 0;
 
-	A1 = locator[0] - 65;
-	A2 = locator[1] - 65;
-	N1 = locator[2] - 48;
-	N2 = locator[3] - 48;
+	uint8_t A1 = locator[0] - 65;
+	uint8_t A2 = locator[1] - 65;
+	uint8_t N1 = locator[2] - 48;
+	uint8_t N2 = locator[3] - 48;
 
 	if (A1 >= 0 && A1 <= 17)
 		test++;
@@ -208,14 +203,10 @@ static int validate_locator(const char locator[]) {
 }
 
 void clear_log_stored_data(void) {
-
-	const char call_blank[] = "       ";
-	const char locator_blank[] = "    ";
-
 	for (int i = 0; i < ANSWER_CQ_COUNT; i++) {
 		Answer_CQ[i].number_times_called = 0;
-		strcpy(Answer_CQ[i].call, call_blank);
-		strcpy(Answer_CQ[i].locator, locator_blank);
+		Answer_CQ[i].call[0] = 0;
+		Answer_CQ[i].locator[0] = 0;
 		Answer_CQ[i].RSL = 0;
 		Answer_CQ[i].RR73 = 0;
 	}
@@ -233,9 +224,9 @@ int Check_Calling_Stations(int num_decoded, int reply_state) {
 			old_call = 0;
 
 			for (int j = 0; j < num_calls; j++) {
-				Calling_Station *s = &Answer_CQ[j]; 
-				if (strcmp(s->call, new_decoded[i].field2) == 0) {
-					old_call = ++s->number_times_called;
+				Calling_Station *stn = &Answer_CQ[j];
+				if (strcmp(stn->call, new_decoded[i].field2) == 0) {
+					old_call = ++stn->number_times_called;
 					old_call_address = j;
 				}
 
@@ -263,15 +254,13 @@ int Check_Calling_Stations(int num_decoded, int reply_state) {
 
 				Beacon_Reply_Status = 1;
 
-				Calling_Station *s = &Answer_CQ[num_calls];
-				strcpy(s->call, new_decoded[i].field2);
-				strcpy(s->locator, new_decoded[i].target);
-				s->RSL = Target_RSL;
+				Calling_Station *stn = &Answer_CQ[num_calls];
+				strcpy(stn->call, new_decoded[i].field2);
+				strcpy(stn->locator, new_decoded[i].target);
+				stn->RSL = Target_RSL;
 
 				num_calls++;
-
 				break;
-
 			}
 
 			if (old_call >= 1) {
@@ -279,13 +268,14 @@ int Check_Calling_Stations(int num_decoded, int reply_state) {
 				sprintf(current_Beacon_receive_message, " %s %s %s", field1, field2, field3);
 				sprintf(current_QSO_receive_message, " %s %s %s", field1, field2, field3);
 
-			    if (Beacon_On == 1)
+			    if (Beacon_On == 1) {
 			    	update_Beacon_log_display(0);
-			    else if (Beacon_On == 0)
+			    }
+			    else if (Beacon_On == 0) {
 			    	update_log_display(0);
+			    }
 
 				if (Answer_CQ[old_call_address].RR73 == 0) {
-
 					memcpy(Target_Call, Answer_CQ[old_call_address].call, CALL_SIZE);
 					Target_Call[CALL_SIZE-1] = 0;
 					strcpy(Target_Locator, Answer_CQ[old_call_address].locator);
@@ -295,19 +285,15 @@ int Check_Calling_Stations(int num_decoded, int reply_state) {
 						set_reply(1);
 
 					Answer_CQ[old_call_address].RR73 = 1;
-
 					Beacon_Reply_Status = 1;
 				}
 				else
 					Beacon_Reply_Status = 0;
-
 			}
 		}   //check for station call
-
 	} //check to see if being called
 
 	return Beacon_Reply_Status;
-
 }
 
 void process_selected_Station(int stations_decoded, int TouchIndex) {
@@ -329,7 +315,6 @@ void process_selected_Station(int stations_decoded, int TouchIndex) {
 	}
 
 	FT8_Touch_Flag = 0;
-
 }
 
 void set_QSO_Xmit_Freq(int freq) {
@@ -341,15 +326,15 @@ void set_QSO_Xmit_Freq(int freq) {
 	show_variable(400, 25,(int)  NCO_Frequency );
 }
 
-static int strindex(const char s[], const char t[]) {
-	int i, j, k, result;
+static int strindex(const char s[], const char t[]) 
+{
+	int result = -1;
 
-	result = -1;
-
-	for (i = 0; s[i] != '\0'; i++) {
-		for (j = i, k = 0; t[k] != '\0' && s[j] == t[k]; j++, k++)
+	for (int i = 0; s[i] != 0; i++) {
+		int k = 0;
+		for (int j = i, k = 0; t[k] != 0 && s[j] == t[k]; j++, k++)
 			;
-		if (k > 0 && t[k] == '\0')
+		if (k > 0 && t[k] == 0)
 			result = i;
 	}
 	return result;

@@ -126,12 +126,10 @@ void compose_messages(void) {
 
 	sprintf(xmit_messages[0].m, "%s %s %s", Target_Call, Station_Call, Locator);
 	sprintf(xmit_messages[1].m, "%s %s R%s", Target_Call, Station_Call, RSL);
-	sprintf(xmit_messages[2].m, "%s %s %s", Target_Call, Station_Call,
-			seventy_three);
+	sprintf(xmit_messages[2].m, "%s %s %s", Target_Call, Station_Call, seventy_three);
 
 	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-	BSP_LCD_DisplayStringAt(240, 240, (const uint8_t*) xmit_messages[0].m,
-			LEFT_MODE);
+	BSP_LCD_DisplayStringAt(240, 240, (const uint8_t*) xmit_messages[0].m, LEFT_MODE);
 }
 
 void que_message(int index) {

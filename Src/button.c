@@ -102,7 +102,7 @@ ButtonStruct sButtonData[NUM_BUTTONS] = {
 		/*x*/180,
 		/*y*/line2,
 		/*w*/0, //setting the width and height to 0 turns off touch response , display only
-				/*h*/0 },
+		 /*h*/0 },
 
 		{	//button 4 turn on logging
 		/*text0*/"Log ",
@@ -597,7 +597,7 @@ void executeButton(uint16_t index) {
 		Options_SetValue(0, BandIndex);
 		Options_StoreValue(0);
 		start_freq = sBand_Data[BandIndex].Frequency;
-		show_wide(380, 0, (int) start_freq);
+		show_wide(380, 0, start_freq);
 
 		sprintf(display_frequency,"%s",sBand_Data[BandIndex].display);
 
@@ -638,7 +638,7 @@ void executeCalibrationButton(uint16_t index) {
 	case 10:  //Lower Band
 		if (BandIndex > 0) {
 			BandIndex--;
-			show_wide(340, 60, sBand_Data[BandIndex].Frequency);
+			show_wide(620, 60, sBand_Data[BandIndex].Frequency);
 			sprintf(display_frequency, "%s", sBand_Data[BandIndex].display);
 		}
 		break;
@@ -646,7 +646,7 @@ void executeCalibrationButton(uint16_t index) {
 	case 11:  //Raise Band
 		if (BandIndex < NUM_BANDS - 1) {
 			BandIndex++;
-			show_wide(340, 60, sBand_Data[BandIndex].Frequency);
+			show_wide(620, 60, sBand_Data[BandIndex].Frequency);
 			sprintf(display_frequency, "%s", sBand_Data[BandIndex].display);
 		}
 		break;
@@ -773,7 +773,7 @@ void setup_Cal_Display(void) {
 	drawButton(14);
 	drawButton(27);
 
-	show_wide(340, 60, (int) start_freq);
+	show_wide(620, 60, start_freq);
 
 	load_RealTime();
 	display_RTC_TimeEdit(RTC_Button - 20, RTC_line0 + 15);
@@ -856,7 +856,7 @@ void xmit_sequence(void) {
 	drawButton(3);
 }
 
-uint64_t F_boot = 11229600000ULL;
+const uint64_t F_boot = 11229600000ULL;
 
 void start_Si5351(void) {
 

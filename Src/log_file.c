@@ -57,7 +57,6 @@ void Open_Log_File(void) {
 	}
 
 	f_close(&LogFile);
-
 }
 
 void Write_Log_Data(char *ch) {
@@ -71,15 +70,11 @@ void Write_Log_Data(char *ch) {
 			f_puts("\n", &LogFile);
 
 		}
-
 		f_close(&LogFile);
-
 	}
-
 }
 
 void Close_Log_File(void) {
-
 	f_close(&LogFile);
 }
 

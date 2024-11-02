@@ -137,24 +137,22 @@ void update_Beacon_log_display(int mode) {
 
 		BSP_LCD_DisplayStringAt(240, 40 + i * 20, (const uint8_t*) Beacon_log_messages[i].message, LEFT_MODE);
 	}
-
 }
 
 void clear_Beacon_log_messages(void){
 
-	char blank[] = "                    ";
+	const char blank[MESSAGE_SIZE] = "                    ";
 
 	for (int i = 0; i < BEACON_MESSAGE_COUNT; i++ )
 		strcpy(Beacon_log_messages[i].message , blank);
-
 }
 
-void show_wide(uint16_t x, uint16_t y, int variable) {
+void show_wide(uint16_t x, uint16_t y, uint16_t variable) {
 	char string[7];   // print format stuff
 	sprintf(string, "%6i", variable);
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
-	BSP_LCD_DisplayStringAt(x, y, (const uint8_t*) string, LEFT_MODE);
+	BSP_LCD_DisplayStringAt(x, y, (const uint8_t*) string, CENTER_MODE);
 }
 
 void show_variable(uint16_t x, uint16_t y, int variable) {
@@ -205,7 +203,7 @@ void setup_display(void) {
     BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
     BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
 
-    BSP_LCD_DisplayStringAt(0, 100, (const uint8_t*) "DX FT8 Version: V1.1", LEFT_MODE);
+    BSP_LCD_DisplayStringAt(0, 100, (const uint8_t*) "DX FT8 Version: V1.1a", LEFT_MODE);
 
 	drawButton(0);
 	drawButton(1);
@@ -224,7 +222,6 @@ void Set_Cursor_Frequency(void) {
 }
 
 void Process_Touch(void) {
-
 	if (!Tune_On && !xmit_flag && !Beacon_On)
 		sButtonData[5].state = 0;
 	else
@@ -256,7 +253,6 @@ void Process_Touch(void) {
 }
 
 uint16_t FFT_Touch(void) {
-
 	if  ((valx > FFT_X  && valx < FFT_X + FFT_W ) && (valy > FFT_Y && valy < 30))
 		return 1;
 
@@ -264,10 +260,8 @@ uint16_t FFT_Touch(void) {
 }
 
 int FT8_Touch(void) {
-
-	int y_test;
 	if ((valx > 0 && valx < 240) && (valy > 40 && valy < 240)) {
-		y_test = valy - 40;
+		int y_test = valy - 40;
 
 		FT_8_TouchIndex = y_test / 20;
 
@@ -305,7 +299,6 @@ int null_count, FFT_Line_Delay;
 
 void Display_WF(void) {
 	if(ft8_marker == 1) {
-
 			for (int x = 0; x < (FFT_W ); x++) *(pWFBfr + (FFT_W*WF_Line0) + x) = 63;
 			ft8_marker = 0;
 

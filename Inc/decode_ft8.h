@@ -25,6 +25,7 @@ typedef struct {
 typedef struct {
 	char message[MESSAGE_SIZE];
 	int text_color;
+	int decoded_index;
 } display_message;
 
 typedef struct {
