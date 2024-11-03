@@ -263,7 +263,6 @@ void make_File_Name(void)
 {
 
 	make_Real_Date();
-
 	sprintf((char *)file_name_string, "%s.adi", log_rtc_date_string);
 }
 
