@@ -17,9 +17,6 @@
 
 #define FT8_X 48
 #define FT8_Y 93
-#define FT8_W ft8_buffer
-
-#define wf_offset 0
 
 TS_StateTypeDef TS_State = {0};
 
@@ -35,11 +32,9 @@ int decode_flag;
 int FT8_Touch_Flag;
 int FT8_Message_Touch;
 
-uint8_t WF_Bfr[FFT_H * (ft8_buffer - ft8_min_bin)];
+uint8_t WF_Bfr[FFT_H * FFT_W];
 
-uint32_t cursor_line[FFT_W];
-
-int power_waterfall_top = 94;
+const int power_waterfall_top = 94;
 uint16_t valx, valy;
 uint8_t test;
 int count;
@@ -88,7 +83,6 @@ void update_log_display(int mode)
 		BSP_LCD_DisplayStringAt(240, 40 + i * 20, (const uint8_t *)log_messages[i].message, LEFT_MODE);
 	}
 }
-
 
 const char blank[MESSAGE_SIZE] = "                    ";
 
@@ -305,53 +299,54 @@ int Xmit_QSO_Message(void)
 	return 0;
 }
 
+static int FFT_Line_Delay = 0;
+
 void Display_WF(void)
 {
 	if (ft8_marker == 1)
 	{
-		memset(WF_Bfr + (FFT_W * (FFT_H - 1)), 63, FFT_W);
+		memset(&WF_Bfr[0] + (FFT_W * (FFT_H - 1)), 63, FFT_W);
 		ft8_marker = 0;
 	}
 	else
 	{
-		memcpy(WF_Bfr + (FFT_W * (FFT_H - 1)), FFT_Buffer + ft8_min_bin, FFT_W);
+		// Note that the source buffer FFT_BUFFER has uint16_t elements so memcpy can't be used
+		for (int x = 0; x < FFT_W; x++)
+		{
+			*(&WF_Bfr[0] + (FFT_W * (FFT_H - 1)) + x) = (uint8_t)FFT_Buffer[x + ft8_min_bin];
+		}
 	}
 
 	// shift data in memory by one time
 	for (int y = 0; y < (FFT_H - 1); y++)
 	{
-		memcpy(WF_Bfr + (FFT_W * y), WF_Bfr + (FFT_W * (y + 1)), FFT_W);
+		memcpy(&WF_Bfr[0] + (FFT_W * y), WF_Bfr + (FFT_W * (y + 1)), FFT_W);
 	}
 
 	for (int y = 0; y < FFT_H; y++)
 	{
-		for (int x = 0; x < ft8_buffer - ft8_min_bin; x++)
+		for (int x = 0; x < FFT_W; x++)
 		{
-			BSP_LCD_DrawPixel(x, y, WFPalette[(*(WF_Bfr + y * FFT_W + x))]);
+			BSP_LCD_DrawPixel(x, y, WFPalette[(*(&WF_Bfr[0] + (y * FFT_W) + x))]);
 		}
 	}
 
 	if (Auto_Sync)
 	{
-		int FFT_Line_Delay = 0;
-
 		int null_count = 0;
-		for (int x = 0; x < ft8_buffer - ft8_min_bin; x++)
+		for (int x = 0; x < FFT_W; x++)
 		{
-			if ((*(WF_Bfr + 39 * FFT_W + x)) > 0 && (++null_count >= 3))
+			if ((*(&WF_Bfr[0] + 39 * FFT_W + x)) > 0 && (++null_count > 2))
 				break;
 		}
 
-		if (null_count < 3)
+		if (null_count < 2 && ++FFT_Line_Delay >= 3)
 		{
-			if (++FFT_Line_Delay >= 2)
-			{
-				FT8_Sync();
-				Auto_Sync = 0;
-				FFT_Line_Delay = 0;
-				sButtonData[5].state = 0;
-				drawButton(5);
-			}
+			FT8_Sync();
+			Auto_Sync = 0;
+			FFT_Line_Delay = 0;
+			sButtonData[5].state = 0;
+			drawButton(5);
 		}
 		null_count = 0;
 	}

@@ -87,7 +87,7 @@ static int in_range(int num, int min, int max)
 	return num;
 }
 
-const uint8_t msg_blank[MESSAGE_SIZE] = "                                    ";
+const uint8_t msg_blank[MESSAGE_SIZE] = "               ";
 //                                       1234567890123^1234567890123^123456^10
 
 void set_reply(uint16_t index)
