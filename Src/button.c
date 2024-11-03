@@ -662,7 +662,7 @@ void executeCalibrationButton(uint16_t index)
 		if (BandIndex > 0)
 		{
 			BandIndex--;
-			show_wide(620, 60, sBand_Data[BandIndex].Frequency);
+			show_wide(615, 55, sBand_Data[BandIndex].Frequency);
 			sprintf(display_frequency, "%s", sBand_Data[BandIndex].display);
 		}
 		break;
@@ -671,7 +671,7 @@ void executeCalibrationButton(uint16_t index)
 		if (BandIndex < NUM_BANDS - 1)
 		{
 			BandIndex++;
-			show_wide(620, 60, sBand_Data[BandIndex].Frequency);
+			show_wide(615, 55, sBand_Data[BandIndex].Frequency);
 			sprintf(display_frequency, "%s", sBand_Data[BandIndex].display);
 		}
 		break;
@@ -816,7 +816,7 @@ void setup_Cal_Display(void)
 	drawButton(14);
 	drawButton(27);
 
-	show_wide(620, 60, start_freq);
+	show_wide(615, 55, start_freq);
 
 	load_RealTime();
 	display_RTC_TimeEdit(RTC_Button - 20, RTC_line0 + 15);
