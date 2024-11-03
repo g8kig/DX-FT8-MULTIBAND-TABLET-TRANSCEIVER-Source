@@ -58,10 +58,11 @@ static FIL fil;
 
 const char CQ[] = "CQ";
 const char seventy_three[] = "RR73";
-const uint8_t blank[] = "                      ";
 
 void set_cq(void)
 {
+	const uint8_t blank[3 + CALL_SIZE + LOCATOR_SIZE] = "               ";
+	//													 CQ 12CALL 1LOCR0
 	char message[sizeof(CQ) + CALL_SIZE + LOCATOR_SIZE];
 	uint8_t packed[K_BYTES];
 
@@ -86,9 +87,11 @@ static int in_range(int num, int min, int max)
 	return num;
 }
 
+const uint8_t msg_blank[MESSAGE_SIZE] = "                                    ";
+//                                       1234567890123^1234567890123^123456^10
+
 void set_reply(uint16_t index)
 {
-
 	uint8_t packed[K_BYTES];
 	char RSL[REPORT_SIZE];
 
@@ -110,7 +113,7 @@ void set_reply(uint16_t index)
 
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-	BSP_LCD_DisplayStringAt(240, 240, blank, LEFT_MODE);
+	BSP_LCD_DisplayStringAt(240, 240, msg_blank, LEFT_MODE);
 	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 	BSP_LCD_DisplayStringAt(240, 240, (const uint8_t *)reply_message,
 							LEFT_MODE);
@@ -147,7 +150,7 @@ void que_message(int index)
 
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-	BSP_LCD_DisplayStringAt(240, 220, blank, LEFT_MODE);
+	BSP_LCD_DisplayStringAt(240, 220, msg_blank, LEFT_MODE);
 
 	BSP_LCD_SetTextColor(LCD_COLOR_RED);
 	BSP_LCD_DisplayStringAt(240, 220, (const uint8_t *)xmit_messages[index].m, LEFT_MODE);
@@ -163,13 +166,13 @@ void clear_qued_message(void)
 
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-	BSP_LCD_DisplayStringAt(240, 220, blank, LEFT_MODE);
+	BSP_LCD_DisplayStringAt(240, 220, msg_blank, LEFT_MODE);
 }
 
 void clear_xmit_messages(void)
 {
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-	BSP_LCD_DisplayStringAt(240, 240, blank, LEFT_MODE);
+	BSP_LCD_DisplayStringAt(240, 240, msg_blank, LEFT_MODE);
 }
 
 void Read_Station_File(void)

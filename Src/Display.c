@@ -35,10 +35,6 @@ int decode_flag;
 int FT8_Touch_Flag;
 int FT8_Message_Touch;
 
-int WF_Line0;
-int WF_Count = 0;
-uint8_t *pWFBfr;
-
 uint8_t WF_Bfr[FFT_H * (ft8_buffer - ft8_min_bin)];
 
 uint32_t cursor_line[FFT_W];
@@ -93,11 +89,11 @@ void update_log_display(int mode)
 	}
 }
 
+
+const char blank[MESSAGE_SIZE] = "                    ";
+
 void clear_log_messages(void)
 {
-
-	char blank[] = "                    ";
-
 	for (int i = 0; i < LOG_MESSAGE_COUNT; i++)
 		strcpy(log_messages[i].message, blank);
 }
@@ -109,7 +105,6 @@ display_message Beacon_log_messages[BEACON_MESSAGE_COUNT];
 
 void update_Beacon_log_display(int mode)
 {
-
 	for (int i = 0; i < BEACON_MESSAGE_COUNT - 1; i++)
 	{
 		strcpy(Beacon_log_messages[i].message,
@@ -149,9 +144,6 @@ void update_Beacon_log_display(int mode)
 
 void clear_Beacon_log_messages(void)
 {
-
-	const char blank[MESSAGE_SIZE] = "                    ";
-
 	for (int i = 0; i < BEACON_MESSAGE_COUNT; i++)
 		strcpy(Beacon_log_messages[i].message, blank);
 }
@@ -207,7 +199,6 @@ void show_Real_Date(uint16_t x, uint16_t y, int date, int month, int year)
 
 void setup_display(void)
 {
-
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 	BSP_LCD_FillRect(0, 0, 480, 272);
 
@@ -217,7 +208,7 @@ void setup_display(void)
 	BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
 	BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
 
-	BSP_LCD_DisplayStringAt(0, 100, (const uint8_t *)"DX FT8 Version: V1.1a", LEFT_MODE);
+	BSP_LCD_DisplayStringAt(0, 100, (const uint8_t *)"DX FT8 Version: V1.1b", LEFT_MODE);
 
 	drawButton(0);
 	drawButton(1);
@@ -247,7 +238,6 @@ void Process_Touch(void)
 
 	if (TS_State.touchDetected > 0)
 	{
-
 		valx = (uint16_t)TS_State.touchX[0];
 		valy = (uint16_t)TS_State.touchY[0];
 
@@ -315,67 +305,46 @@ int Xmit_QSO_Message(void)
 	return 0;
 }
 
-void Init_Waterfall(void)
-{
-	pWFBfr = &WF_Bfr[0];
-	WF_Count = 0;
-	WF_Line0 = FFT_H - 1;
-}
-
-int null_count, FFT_Line_Delay;
-
 void Display_WF(void)
 {
 	if (ft8_marker == 1)
 	{
-		for (int x = 0; x < (FFT_W); x++)
-			*(pWFBfr + (FFT_W * WF_Line0) + x) = 63;
+		memset(WF_Bfr + (FFT_W * (FFT_H - 1)), 63, FFT_W);
 		ft8_marker = 0;
 	}
 	else
 	{
-
-		for (int x = 0; x < FFT_W; x++)
-		{
-
-			*(pWFBfr + (FFT_W * WF_Line0) + x) = (uint8_t)FFT_Buffer[x + ft8_min_bin];
-		}
+		memcpy(WF_Bfr + (FFT_W * (FFT_H - 1)), FFT_Buffer + ft8_min_bin, FFT_W);
 	}
 
-	// shift data in memory by one time stepft8_buffer
-	for (int y = 0; y < WF_Line0; y++)
+	// shift data in memory by one time
+	for (int y = 0; y < (FFT_H - 1); y++)
 	{
-		for (int x = 0; x < FFT_W; x++)
-		{
-
-			*(pWFBfr + (FFT_W * y) + x) = *(pWFBfr + (FFT_W * (y + 1)) + x);
-		}
+		memcpy(WF_Bfr + (FFT_W * y), WF_Bfr + (FFT_W * (y + 1)), FFT_W);
 	}
 
 	for (int y = 0; y < FFT_H; y++)
 	{
 		for (int x = 0; x < ft8_buffer - ft8_min_bin; x++)
 		{
-
-			BSP_LCD_DrawPixel(x, y, WFPalette[(*(pWFBfr + y * FFT_W + x))]);
+			BSP_LCD_DrawPixel(x, y, WFPalette[(*(WF_Bfr + y * FFT_W + x))]);
 		}
 	}
 
 	if (Auto_Sync)
 	{
+		int FFT_Line_Delay = 0;
+
+		int null_count = 0;
 		for (int x = 0; x < ft8_buffer - ft8_min_bin; x++)
 		{
-
-			if ((*(pWFBfr + 39 * FFT_W + x)) > 0)
-				null_count++;
+			if ((*(WF_Bfr + 39 * FFT_W + x)) > 0 && (++null_count >= 3))
+				break;
 		}
 
 		if (null_count < 3)
 		{
-
-			FFT_Line_Delay++;
-
-			if (FFT_Line_Delay >= 2)
+			if (++FFT_Line_Delay >= 2)
 			{
 				FT8_Sync();
 				Auto_Sync = 0;
@@ -386,6 +355,7 @@ void Display_WF(void)
 		}
 		null_count = 0;
 	}
+
 	BSP_LCD_SetTextColor(LCD_COLOR_RED);
 	BSP_LCD_DrawLine(FFT_X + cursor, FFT_H, FFT_X + cursor, 0);
 }

@@ -139,6 +139,7 @@ int ft8_decode(void)
 			}
 			else
 			{
+				// Invalid locator
 				new_decoded[num_decoded].target[0] = 0;
 			}
 
@@ -212,14 +213,7 @@ static int validate_locator(const char locator[])
 
 void clear_log_stored_data(void)
 {
-	for (int i = 0; i < ANSWER_CQ_COUNT; i++)
-	{
-		Answer_CQ[i].number_times_called = 0;
-		Answer_CQ[i].call[0] = 0;
-		Answer_CQ[i].locator[0] = 0;
-		Answer_CQ[i].RSL = 0;
-		Answer_CQ[i].RR73 = 0;
-	}
+	memset(Answer_CQ, 0, sizeof(Answer_CQ));
 }
 
 int Check_Calling_Stations(int num_decoded, int reply_state)
@@ -339,7 +333,6 @@ void process_selected_Station(int stations_decoded, int TouchIndex)
 
 void set_QSO_Xmit_Freq(int freq)
 {
-
 	freq = freq - ft8_min_freq;
 	cursor = (uint16_t)((float)freq / FFT_Resolution);
 

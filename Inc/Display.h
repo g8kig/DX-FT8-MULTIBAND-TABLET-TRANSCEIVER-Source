@@ -54,8 +54,6 @@ uint16_t FFT_Touch(void);
 
 int FT8_Touch(void);
 
-void Init_Waterfall(void);
-
 void Display_WF(void);
 
 int Xmit_message_Touch(void);
