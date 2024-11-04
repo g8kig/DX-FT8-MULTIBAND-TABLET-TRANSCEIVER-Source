@@ -202,7 +202,7 @@ void setup_display(void)
 	BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
 	BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
 
-	BSP_LCD_DisplayStringAt(0, 100, (const uint8_t *)"DX FT8 Version: V1.1b", LEFT_MODE);
+	BSP_LCD_DisplayStringAt(0, 100, (const uint8_t *)"DX FT8 Version: V1.1c", LEFT_MODE);
 
 	drawButton(0);
 	drawButton(1);

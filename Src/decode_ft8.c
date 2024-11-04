@@ -116,8 +116,13 @@ int ft8_decode(void)
 
 		if (!found && num_decoded < DECODED_MESSAGE_COUNT)
 		{
-			if (strlen(field2) >= CALL_SIZE)
+			// Ignore 'spaceship' callsigns
+			if (field1[0] == '<')
 				continue;
+			// Also ignore callsigns that are too large
+			if (field2[0] == '<' || strlen(field2) >= CALL_SIZE)
+				continue;
+			// Also ignore locators that are too large
 			if (strlen(field3) >= LOCATOR_SIZE)
 				continue;
 
