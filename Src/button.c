@@ -654,6 +654,28 @@ void executeButton(uint16_t index)
 	}
 }
 
+static void processButton(int id, int isIncrement, int isDate)
+{
+	RTCStruct *data = &s_RTC_Data[id];
+	if (isIncrement ?
+			data->data < data->Maximum :
+			data->data > data->Minimum)
+	{
+		data->data = isIncrement ?
+				data->data + 1 :
+				data->data - 1;
+	}
+	else
+	{
+		data->data = isIncrement ?
+				data->Minimum :
+				data->Maximum;
+	}
+	isDate ?
+		display_RTC_DateEdit(RTC_Button - 20, RTC_line3 + 15) :
+		display_RTC_TimeEdit(RTC_Button - 20, RTC_line0 + 15);
+}
+
 void executeCalibrationButton(uint16_t index)
 {
 	switch (index)
@@ -677,99 +699,51 @@ void executeCalibrationButton(uint16_t index)
 		break;
 
 	case 15: // Lower Hour
-		if (s_RTC_Data[3].data > s_RTC_Data[3].Minimum)
-		{
-			s_RTC_Data[3].data--;
-			display_RTC_TimeEdit(RTC_Button - 20, RTC_line0 + 15);
-		}
+		processButton(3, 0, 0);
 		break;
 
 	case 16: // Raise Hour
-		if (s_RTC_Data[3].data < s_RTC_Data[3].Maximum)
-		{
-			s_RTC_Data[3].data++;
-			display_RTC_TimeEdit(RTC_Button - 20, RTC_line0 + 15);
-		}
+		processButton(3, 1, 0);
 		break;
 
 	case 17: // Lower Minute
-		if (s_RTC_Data[4].data > s_RTC_Data[4].Minimum)
-		{
-			s_RTC_Data[4].data--;
-			display_RTC_TimeEdit(RTC_Button - 20, RTC_line0 + 15);
-		}
+		processButton(4, 0, 0);
 		break;
 
 	case 18: // Raise Minute
-		if (s_RTC_Data[4].data < s_RTC_Data[4].Maximum)
-		{
-			s_RTC_Data[4].data++;
-			display_RTC_TimeEdit(RTC_Button - 20, RTC_line0 + 15);
-		}
+		processButton(4, 1, 0);
 		break;
 
 	case 19: // Lower Second
-		if (s_RTC_Data[5].data > s_RTC_Data[5].Minimum)
-		{
-			s_RTC_Data[5].data--;
-			display_RTC_TimeEdit(RTC_Button - 20, RTC_line0 + 15);
-		}
+		processButton(4, 0, 0);
 		break;
 
 	case 20: // Raise Second
-		if (s_RTC_Data[5].data < s_RTC_Data[5].Maximum)
-		{
-			s_RTC_Data[5].data++;
-			display_RTC_TimeEdit(RTC_Button - 20, RTC_line0 + 15);
-		}
+		processButton(4, 1, 0);
 		break;
 
 	case 21: // Lower Day
-		if (s_RTC_Data[0].data > s_RTC_Data[0].Minimum)
-		{
-			s_RTC_Data[0].data--;
-			display_RTC_DateEdit(RTC_Button - 20, RTC_line3 + 15);
-		}
+		processButton(0, 0, 1);
 		break;
 
 	case 22: // Raise Day
-		if (s_RTC_Data[0].data < s_RTC_Data[0].Maximum)
-		{
-			s_RTC_Data[0].data++;
-			display_RTC_DateEdit(RTC_Button - 20, RTC_line3 + 15);
-		}
+		processButton(0, 1, 1);
 		break;
 
 	case 23: // Lower Month
-		if (s_RTC_Data[1].data > s_RTC_Data[1].Minimum)
-		{
-			s_RTC_Data[1].data--;
-			display_RTC_DateEdit(RTC_Button - 20, RTC_line3 + 15);
-		}
+		processButton(1, 0, 1);
 		break;
 
 	case 24: // Raise Month
-		if (s_RTC_Data[1].data < s_RTC_Data[1].Maximum)
-		{
-			s_RTC_Data[1].data++;
-			display_RTC_DateEdit(RTC_Button - 20, RTC_line3 + 15);
-		}
+		processButton(1, 1, 1);
 		break;
 
 	case 25: // Lower Year
-		if (s_RTC_Data[2].data > s_RTC_Data[2].Minimum)
-		{
-			s_RTC_Data[2].data--;
-			display_RTC_DateEdit(RTC_Button - 20, RTC_line3 + 15);
-		}
+		processButton(2, 0, 1);
 		break;
 
 	case 26: // Raise Year
-		if (s_RTC_Data[2].data < s_RTC_Data[2].Maximum)
-		{
-			s_RTC_Data[2].data++;
-			display_RTC_DateEdit(RTC_Button - 20, RTC_line3 + 15);
-		}
+		processButton(2, 1, 1);
 		break;
 	}
 }
