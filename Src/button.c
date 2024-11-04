@@ -513,7 +513,7 @@ void executeButton(uint16_t index)
 			Beacon_On = 1;
 			cursor = 112; // 1000 Hz
 			Set_Cursor_Frequency();
-			show_variable(395, 25, (int)NCO_Frequency);
+			show_variable(400, 25, (int)NCO_Frequency);
 			clear_reply_message_box();
 			clear_log_stored_data();
 			clear_Beacon_log_messages();
