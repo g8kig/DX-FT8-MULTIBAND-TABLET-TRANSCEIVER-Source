@@ -686,13 +686,15 @@ static void processButton(int id, int isIncrement)
 		}
 	}
 	else
-	if (data->data > data->Minimum)
 	{
-		--data->data;
-	}
-	else
-	{
-		data->data = data->Maximum;
+		if (data->data > data->Minimum)
+		{
+			--data->data;
+		}
+		else
+		{
+			data->data = data->Maximum;
+		}
 	}
 
 	if (id < 3)
