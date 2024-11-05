@@ -654,26 +654,61 @@ void executeButton(uint16_t index)
 	}
 }
 
-static void processButton(int id, int isIncrement, int isDate)
+static int is_leap_year(int year)
+{
+	return (year % 400 == 0) || ((year % 100 != 0) && (year % 4 == 0));
+}
+
+static int days_per_month(int year, int month)
+{
+  static const char dpm[] = {31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+  if (month == 2 && is_leap_year(year))
+  {
+    return 29;
+  }
+  return dpm[month];
+}
+
+// explanation of 'id' day  = 0, month  = 1, year   = 2,
+//					   hour = 3, minute = 4, second = 5
+static void processButton(int id, int isIncrement)
 {
 	RTCStruct *data = &s_RTC_Data[id];
-	if (isIncrement ?
-			data->data < data->Maximum :
-			data->data > data->Minimum)
+	if (isIncrement)
 	{
-		data->data = isIncrement ?
-				data->data + 1 :
-				data->data - 1;
+		if (data->data < data->Maximum)
+		{
+			++data->data;
+		}
+		else
+		{
+			data->data = data->Minimum;
+		}
+	}
+	else
+	if (data->data > data->Minimum)
+	{
+		--data->data;
 	}
 	else
 	{
-		data->data = isIncrement ?
-				data->Minimum :
-				data->Maximum;
+		data->data = data->Maximum;
 	}
-	isDate ?
-		display_RTC_DateEdit(RTC_Button - 20, RTC_line3 + 15) :
+
+	if (id < 3)
+	{
+		const int dpm = days_per_month(2000 + s_RTC_Data[2].data, s_RTC_Data[1].data - 1);
+		if (s_RTC_Data[0].data > dpm)
+		{
+			s_RTC_Data[0].data = dpm;
+		}
+
+		display_RTC_DateEdit(RTC_Button - 20, RTC_line3 + 15);
+	}
+	else
+	{
 		display_RTC_TimeEdit(RTC_Button - 20, RTC_line0 + 15);
+	}
 }
 
 void executeCalibrationButton(uint16_t index)
@@ -699,51 +734,51 @@ void executeCalibrationButton(uint16_t index)
 		break;
 
 	case 15: // Lower Hour
-		processButton(3, 0, 0);
+		processButton(3, 0);
 		break;
 
 	case 16: // Raise Hour
-		processButton(3, 1, 0);
+		processButton(3, 1);
 		break;
 
 	case 17: // Lower Minute
-		processButton(4, 0, 0);
+		processButton(4, 0);
 		break;
 
 	case 18: // Raise Minute
-		processButton(4, 1, 0);
+		processButton(4, 1);
 		break;
 
 	case 19: // Lower Second
-		processButton(4, 0, 0);
+		processButton(5, 0);
 		break;
 
 	case 20: // Raise Second
-		processButton(4, 1, 0);
+		processButton(5, 1);
 		break;
 
 	case 21: // Lower Day
-		processButton(0, 0, 1);
+		processButton(0, 0);
 		break;
 
 	case 22: // Raise Day
-		processButton(0, 1, 1);
+		processButton(0, 1);
 		break;
 
 	case 23: // Lower Month
-		processButton(1, 0, 1);
+		processButton(1, 0);
 		break;
 
 	case 24: // Raise Month
-		processButton(1, 1, 1);
+		processButton(1, 1);
 		break;
 
 	case 25: // Lower Year
-		processButton(2, 0, 1);
+		processButton(2, 0);
 		break;
 
 	case 26: // Raise Year
-		processButton(2, 1, 1);
+		processButton(2, 1);
 		break;
 	}
 }
