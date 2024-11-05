@@ -654,12 +654,12 @@ void executeButton(uint16_t index)
 	}
 }
 
-static int is_leap_year(int year)
+static int is_leap_year(unsigned int year)
 {
 	return (year % 400 == 0) || ((year % 100 != 0) && (year % 4 == 0));
 }
 
-static int days_per_month(int year, int month)
+static char days_per_month(unsigned int year, unsigned char month)
 {
   static const char dpm[] = {31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
   if (month == 2 && is_leap_year(year))
@@ -699,7 +699,7 @@ static void processButton(int id, int isIncrement)
 
 	if (id < 3)
 	{
-		const int dpm = days_per_month(2000 + s_RTC_Data[2].data, s_RTC_Data[1].data - 1);
+		const char dpm = days_per_month(2000 + s_RTC_Data[2].data, s_RTC_Data[1].data - 1);
 		if (s_RTC_Data[0].data > dpm)
 		{
 			s_RTC_Data[0].data = dpm;
