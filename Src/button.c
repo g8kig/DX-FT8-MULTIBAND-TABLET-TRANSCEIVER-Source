@@ -829,7 +829,7 @@ void setup_Cal_Display(void)
 	drawButton(14);
 	drawButton(27);
 
-	show_wide(380, 55, start_freq);
+	show_wide(340, 55, start_freq);
 
 	load_RealTime();
 	display_RTC_TimeEdit(RTC_Button - 20, RTC_line0 + 15);
