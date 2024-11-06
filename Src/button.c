@@ -654,14 +654,14 @@ void executeButton(uint16_t index)
 	}
 }
 
-static int is_leap_year(unsigned int year)
+static int is_leap_year(uint8_t year)
 {
 	return (year % 400 == 0) || ((year % 100 != 0) && (year % 4 == 0));
 }
 
-static char days_per_month(unsigned int year, unsigned char month)
+static uint8_t days_per_month(uint8_t year, uint8_t month)
 {
-  static const char dpm[] = {31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+  static const uint8_t dpm[] = {31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
   if (month == 2 && is_leap_year(year))
   {
     return 29;
@@ -669,8 +669,9 @@ static char days_per_month(unsigned int year, unsigned char month)
   return dpm[month];
 }
 
-// explanation of 'id' day  = 0, month  = 1, year   = 2,
-//					   hour = 3, minute = 4, second = 5
+// fields in s_RTC_Data (and id below)
+enum { day = 0, month = 1, year = 2, hour = 3, minute = 4, second = 5 };
+
 static void processButton(int id, int isIncrement)
 {
 	RTCStruct *data = &s_RTC_Data[id];
@@ -682,6 +683,7 @@ static void processButton(int id, int isIncrement)
 		}
 		else
 		{
+			// Wrap around to the minimum
 			data->data = data->Minimum;
 		}
 	}
@@ -693,18 +695,25 @@ static void processButton(int id, int isIncrement)
 		}
 		else
 		{
+			// Wrap around to the maximum
 			data->data = data->Maximum;
 		}
 	}
 
-	if (id < 3)
+	if (id <= year) // changing the day or month or year?
 	{
-		const char dpm = days_per_month(2000 + s_RTC_Data[2].data, s_RTC_Data[1].data);
-		if (s_RTC_Data[0].data > dpm)
+		const uint8_t dpm = days_per_month(2000 + s_RTC_Data[year].data, s_RTC_Data[month].data);
+		// Is the day of the month out of range?
+		if (s_RTC_Data[day].data > dpm)
 		{
-			s_RTC_Data[0].data = (id == 0) 
+			// Are we changing the day of the month?
+			s_RTC_Data[day].data = (id == day)
+				// Yes, are we incrementing the day of the month?
 				? isIncrement 
+					// If yes wrap around to the minimum otherwise
+					// must be decrementing so use the days per month
 					? data->Minimum : dpm
+					// if setting month or year set to days per month.
 				: dpm;
 		}
 		display_RTC_DateEdit(RTC_Button - 20, RTC_line3 + 15);
@@ -738,51 +747,51 @@ void executeCalibrationButton(uint16_t index)
 		break;
 
 	case 15: // Lower Hour
-		processButton(3, 0);
+		processButton(hour, 0);
 		break;
 
 	case 16: // Raise Hour
-		processButton(3, 1);
+		processButton(hour, 1);
 		break;
 
 	case 17: // Lower Minute
-		processButton(4, 0);
+		processButton(minute, 0);
 		break;
 
 	case 18: // Raise Minute
-		processButton(4, 1);
+		processButton(minute, 1);
 		break;
 
 	case 19: // Lower Second
-		processButton(5, 0);
+		processButton(second, 0);
 		break;
 
 	case 20: // Raise Second
-		processButton(5, 1);
+		processButton(second, 1);
 		break;
 
 	case 21: // Lower Day
-		processButton(0, 0);
+		processButton(day, 0);
 		break;
 
 	case 22: // Raise Day
-		processButton(0, 1);
+		processButton(day, 1);
 		break;
 
 	case 23: // Lower Month
-		processButton(1, 0);
+		processButton(month, 0);
 		break;
 
 	case 24: // Raise Month
-		processButton(1, 1);
+		processButton(month, 1);
 		break;
 
 	case 25: // Lower Year
-		processButton(2, 0);
+		processButton(year, 0);
 		break;
 
 	case 26: // Raise Year
-		processButton(2, 1);
+		processButton(year, 1);
 		break;
 	}
 }
@@ -803,7 +812,6 @@ uint16_t testButton(uint16_t x, uint16_t y, uint16_t w, uint16_t h)
 
 void setup_Cal_Display(void)
 {
-
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 	BSP_LCD_FillRect(0, FFT_H, 480, 201);
 
@@ -903,7 +911,6 @@ void set_codec_input_gain(void)
 
 void receive_sequence(void)
 {
-
 	PTT_Out_Set(); // set output high to connect receiver to antenna
 	HAL_Delay(10);
 	sButtonData[3].state = 0;
@@ -912,7 +919,6 @@ void receive_sequence(void)
 
 void xmit_sequence(void)
 {
-
 	PTT_Out_RST_Clr(); // set output low to disconnect receiver from antenna
 	HAL_Delay(10);
 	sButtonData[3].state = 1;
@@ -923,7 +929,6 @@ const uint64_t F_boot = 11229600000ULL;
 
 void start_Si5351(void)
 {
-
 	init(SI5351_CRYSTAL_LOAD_0PF, SI5351_XTAL_FREQ, 0);
 	drive_strength(SI5351_CLK0, SI5351_DRIVE_8MA);
 	drive_strength(SI5351_CLK1, SI5351_DRIVE_2MA);
