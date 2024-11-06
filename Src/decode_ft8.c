@@ -154,7 +154,7 @@ int ft8_decode(void)
 	return num_decoded;
 }
 
-void display_messages(int decoded_messages)
+void display_messages(int num_decoded)
 {
 	const char CQ[] = "CQ";
 
@@ -162,7 +162,7 @@ void display_messages(int decoded_messages)
 	BSP_LCD_FillRect(0, FFT_H, 240, 200);
 	BSP_LCD_SetFont(&Font16);
 
-	for (int i = 0; i < decoded_messages && i < DECODED_MESSAGE_COUNT; i++)
+	for (int i = 0; i < num_decoded && i < DISPLAY_MESSAGE_COUNT; i++)
 	{
 		const char *field1 = new_decoded[i].field1;
 		const char *field2 = new_decoded[i].field2;
@@ -176,7 +176,7 @@ void display_messages(int decoded_messages)
 			display[i].text_color = 0;
 	}
 
-	for (int j = 0; j < decoded_messages && j < DECODED_MESSAGE_COUNT; j++)
+	for (int j = 0; j < num_decoded && j < DISPLAY_MESSAGE_COUNT; j++)
 	{
 		if (display[j].text_color == 0)
 			BSP_LCD_SetTextColor(LCD_COLOR_WHITE);

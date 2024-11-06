@@ -148,7 +148,7 @@ void show_wide(uint16_t x, uint16_t y, uint16_t variable)
 	sprintf(string, "%6i", variable);
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
-	BSP_LCD_DisplayStringAt(x, y, (const uint8_t *)string, CENTER_MODE);
+	BSP_LCD_DisplayStringAt(x, y, (const uint8_t *)string, LEFT_MODE);
 }
 
 void show_variable(uint16_t x, uint16_t y, int variable)
@@ -202,7 +202,7 @@ void setup_display(void)
 	BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
 	BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
 
-	BSP_LCD_DisplayStringAt(0, 100, (const uint8_t *)"DX FT8 Version: V1.1c", LEFT_MODE);
+	BSP_LCD_DisplayStringAt(0, 100, (const uint8_t *)"DX FT8 Version: V1.1d", LEFT_MODE);
 
 	drawButton(0);
 	drawButton(1);

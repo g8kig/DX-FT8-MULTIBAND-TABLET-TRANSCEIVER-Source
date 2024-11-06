@@ -8,7 +8,6 @@
 #ifndef TRAFFIC_MANAGER_H_
 #define TRAFFIC_MANAGER_H_
 
-extern int CQ_State;
 extern int Beacon_State;
 extern int stop_QSO_reply;
 

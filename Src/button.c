@@ -699,12 +699,14 @@ static void processButton(int id, int isIncrement)
 
 	if (id < 3)
 	{
-		const char dpm = days_per_month(2000 + s_RTC_Data[2].data, s_RTC_Data[1].data - 1);
+		const char dpm = days_per_month(2000 + s_RTC_Data[2].data, s_RTC_Data[1].data);
 		if (s_RTC_Data[0].data > dpm)
 		{
-			s_RTC_Data[0].data = dpm;
+			s_RTC_Data[0].data = (id == 0) 
+				? isIncrement 
+					? data->Minimum : dpm
+				: dpm;
 		}
-
 		display_RTC_DateEdit(RTC_Button - 20, RTC_line3 + 15);
 	}
 	else
@@ -721,7 +723,7 @@ void executeCalibrationButton(uint16_t index)
 		if (BandIndex > 0)
 		{
 			BandIndex--;
-			show_wide(615, 55, sBand_Data[BandIndex].Frequency);
+			show_wide(340, 55, sBand_Data[BandIndex].Frequency);
 			sprintf(display_frequency, "%s", sBand_Data[BandIndex].display);
 		}
 		break;
@@ -730,7 +732,7 @@ void executeCalibrationButton(uint16_t index)
 		if (BandIndex < NUM_BANDS - 1)
 		{
 			BandIndex++;
-			show_wide(615, 55, sBand_Data[BandIndex].Frequency);
+			show_wide(340, 55, sBand_Data[BandIndex].Frequency);
 			sprintf(display_frequency, "%s", sBand_Data[BandIndex].display);
 		}
 		break;
@@ -827,7 +829,7 @@ void setup_Cal_Display(void)
 	drawButton(14);
 	drawButton(27);
 
-	show_wide(615, 55, start_freq);
+	show_wide(380, 55, start_freq);
 
 	load_RealTime();
 	display_RTC_TimeEdit(RTC_Button - 20, RTC_line0 + 15);

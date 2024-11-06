@@ -55,7 +55,7 @@ extern int Auto_QSO_State;
 int Check_Calling_Stations(int num_decoded, int reply_state);
 void Check_CQ_Stations(int num_decoded);
 void clear_CQ_List_box(void);
-void display_messages(int decoded_messages);
+void display_messages(int num_decoded);
 int Check_CQ_Calling_Stations(int num_decoded, int reply_state);
 void clear_CQ_List_box(void);
 void clear_messages(void);

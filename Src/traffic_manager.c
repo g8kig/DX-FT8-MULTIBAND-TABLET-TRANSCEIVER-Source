@@ -19,29 +19,23 @@
 
 #define FT8_TONE_SPACING 625
 
-int CQ_State;
 int Beacon_State;
-
 int Auto_QSO_State;
-int QSO_xmit_count;
-int CQ_State;
 int stop_QSO_reply;
 
 void service_QSO_mode(int decoded_signals, int message_touch)
 {
+	int RSL_sent = 0;
+	int QSO_xmit_count = 0;
 
-	int receive_status;
-
-	receive_status = Check_Calling_Stations(decoded_signals, 0);
-
-	if (receive_status == 1 && Auto_QSO_State != 2 && stop_QSO_reply == 0)
+	int receive_status = Check_Calling_Stations(decoded_signals, 0);
+	if (receive_status == 1 && Auto_QSO_State != 2 && RSL_sent == 0)
 	{
 		Auto_QSO_State = 2;
 	}
 
 	switch (Auto_QSO_State)
 	{
-
 	case 0:
 		break;
 
@@ -61,6 +55,7 @@ void service_QSO_mode(int decoded_signals, int message_touch)
 		que_message(1);
 		QSO_xmit = 1;
 		Auto_QSO_State = 3;
+		RSL_sent = 1;
 		break;
 
 	case 3:
@@ -73,6 +68,7 @@ void service_QSO_mode(int decoded_signals, int message_touch)
 		clear_xmit_messages();
 		Auto_QSO_State = 0;
 		stop_QSO_reply = 1;
+		RSL_sent = 0;
 		break;
 	}
 }
