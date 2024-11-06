@@ -79,7 +79,6 @@ void service_Beacon_mode(int decoded_signals)
 
 	switch (Beacon_State)
 	{
-
 	case 0:
 		break;
 
@@ -126,7 +125,7 @@ void terminate_QSO(void)
 	xmit_flag = 0;
 }
 
-uint64_t F_Long, F_FT8, F_Receive;
+static uint64_t F_Long, F_FT8, F_Receive;
 
 void ft8_transmit_sequence(void)
 {

@@ -29,6 +29,7 @@
 #include "traffic_manager.h"
 #include "ADIF.h"
 #include "DS3231.h"
+#include "Logging.h"
 
 #define LDPC_ITERATIONS 20
 #define MINIMUM_SCORE 40 // Minimum sync score threshold for candidates
@@ -316,13 +317,16 @@ void process_selected_Station(int stations_decoded, int TouchIndex)
 {
 	if (stations_decoded > 0 && TouchIndex <= stations_decoded)
 	{
-		memcpy(Target_Call, new_decoded[TouchIndex].field2, CALL_SIZE);
+		const Decode *decode = &new_decoded[TouchIndex];
+
+		memcpy(Target_Call, decode->field2, CALL_SIZE);
 		Target_Call[CALL_SIZE - 1] = 0;
 
-		strcpy(Target_Locator, new_decoded[TouchIndex].target);
-		Target_RSL = new_decoded[TouchIndex].snr;
-		target_slot = new_decoded[TouchIndex].slot;
-		target_freq = new_decoded[TouchIndex].freq_hz;
+		strcpy(Target_Locator, decode->target);
+		Target_RSL = decode->snr;
+		target_slot = decode->slot;
+		target_freq = decode->freq_hz;
+
 		set_QSO_Xmit_Freq(target_freq);
 
 		compose_messages();

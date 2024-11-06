@@ -59,7 +59,7 @@ const char seventy_three[] = "RR73";
 
 void set_cq(void)
 {
-	const uint8_t blank[3 + CALL_SIZE + LOCATOR_SIZE] = "              }";
+	const uint8_t blank[3 + CALL_SIZE + LOCATOR_SIZE] = "               ";
 	//													 CQ 12CALL 1LOCR-
 	char message[sizeof(CQ) + CALL_SIZE + LOCATOR_SIZE];
 	uint8_t packed[K_BYTES];
@@ -85,7 +85,7 @@ static int in_range(int num, int min, int max)
 	return num;
 }
 
-const uint8_t msg_blank[MESSAGE_SIZE] = "              ]";
+const uint8_t msg_blank[MESSAGE_SIZE] = "               ";
 //                                       1234567890123^1234567890123^123456^10
 
 void set_reply(uint16_t index)
@@ -119,12 +119,8 @@ void set_reply(uint16_t index)
 							LEFT_MODE);
 }
 
-typedef struct
-{
-	char m[MESSAGE_SIZE];
-} Message_T;
-
-static Message_T xmit_messages[XMIT_MESSAGE_COUNT];
+typedef struct { char m[MESSAGE_SIZE]; } MessageT;
+static MessageT xmit_messages[XMIT_MESSAGE_COUNT];
 
 void compose_messages(void)
 {
@@ -137,7 +133,7 @@ void compose_messages(void)
 	sprintf(xmit_messages[2].m, "%s %s %s", Target_Call, Station_Call, seventy_three);
 
 	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-	BSP_LCD_DisplayStringAt(240, 240, (const uint8_t *)xmit_messages[0].m, LEFT_MODE);
+	BSP_LCD_DisplayStringAt(240, 240, (const uint8_t *) xmit_messages[0].m, LEFT_MODE);
 }
 
 void que_message(int index)
@@ -162,7 +158,6 @@ void que_message(int index)
 
 void clear_qued_message(void)
 {
-
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 	BSP_LCD_DisplayStringAt(240, 220, msg_blank, LEFT_MODE);
