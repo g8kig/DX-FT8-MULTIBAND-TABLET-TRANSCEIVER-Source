@@ -1,5 +1,5 @@
 /*
- * log_file.c
+ * adif_export_file.c
  *
  *  Created on: Oct 29, 2019
  *      Author: user
@@ -12,7 +12,6 @@
  *      Author: w2ctx
  */
 
-#include "log_file.h"
 #include "stm32746g_discovery_ts.h"
 #include "stm32746g_discovery_lcd.h"
 #include "button.h"
@@ -29,20 +28,15 @@
 
 #include "ff_gen_drv.h"
 #include "sd_diskio.h"
-#include "arm_math.h"
-
-#include "Display.h"
-#include "main.h"
-#include "gen_ft8.h"
 #include "DS3231.h"
+#include "ADIF_Export_File.h"
 
 /* Fatfs structure */
-FATFS FS;
-FIL LogFile;
+static FATFS FS;
+static FIL LogFile;
 
-void Open_Log_File(void)
+void Open_ADIF_Export_File(void)
 {
-
 	f_mount(&FS, "SD:", 1);
 	if (f_open(&LogFile, file_name_string,
 			   FA_OPEN_ALWAYS | FA_WRITE | FA_OPEN_APPEND) == FR_OK)
@@ -57,28 +51,23 @@ void Open_Log_File(void)
 			f_puts("\n", &LogFile);
 		}
 	}
-
-	f_close(&LogFile);
+	Close_ADIF_Export_File();
 }
 
-void Write_Log_Data(char *ch)
+void Write_ADIF_Export_Data(const char *line)
 {
-	if (sButtonData[4].state == 1)
+	f_mount(&FS, "SD:", 1);
+	if (f_open(&LogFile, file_name_string,
+				FA_OPEN_ALWAYS | FA_WRITE | FA_OPEN_APPEND) == FR_OK)
 	{
-
-		f_mount(&FS, "SD:", 1);
-		if (f_open(&LogFile, file_name_string,
-				   FA_OPEN_ALWAYS | FA_WRITE | FA_OPEN_APPEND) == FR_OK)
-		{
-			f_lseek(&LogFile, f_size(&LogFile));
-			f_puts(ch, &LogFile);
-			f_puts("\n", &LogFile);
-		}
-		f_close(&LogFile);
+		f_lseek(&LogFile, f_size(&LogFile));
+		f_puts(line, &LogFile);
+		f_puts("\n", &LogFile);
 	}
+	Close_ADIF_Export_File();
 }
 
-void Close_Log_File(void)
+void Close_ADIF_Export_File(void)
 {
 	f_close(&LogFile);
 }

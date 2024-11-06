@@ -5,6 +5,7 @@
  *      Author: user
  */
 
+#include <ADIF_Export_File.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -24,14 +25,13 @@
 
 #include "Process_DSP.h"
 #include "stm32746g_discovery_lcd.h"
-#include "log_file.h"
 #include "decode_ft8.h"
 #include "traffic_manager.h"
 #include "ADIF.h"
 #include "DS3231.h"
 
-const int kLDPC_iterations = 20;
-const int kMin_score = 40; // Minimum sync score threshold for candidates
+#define LDPC_ITERATIONS 20
+#define MINIMUM_SCORE 40 // Minimum sync score threshold for candidates
 
 static int validate_locator(const char locator[]);
 static int strindex(const char s[], const char t[]);
@@ -48,13 +48,12 @@ static int num_calls; // number of unique calling stations
 
 int ft8_decode(void)
 {
-
 	// Find top candidates by Costas sync score and localize them in time and frequency
 	Candidate candidate_list[CANDIDATE_COUNT];
 
 	int num_candidates = find_sync(export_fft_power, ft8_msg_samples,
 								   ft8_buffer, kCostas_map, CANDIDATE_COUNT, candidate_list,
-								   kMin_score);
+								   MINIMUM_SCORE);
 	char decoded[DECODED_MESSAGE_COUNT][MESSAGE_SIZE];
 
 	const float fsk_dev = 6.25f; // tone deviation in Hz and symbol rate
@@ -75,7 +74,7 @@ int ft8_decode(void)
 		// bp_decode() produces better decodes, uses way less memory
 		uint8_t plain[N];
 		int n_errors = 0;
-		bp_decode(log174, kLDPC_iterations, plain, &n_errors);
+		bp_decode(log174, LDPC_ITERATIONS, plain, &n_errors);
 
 		if (n_errors > 0)
 			continue;
@@ -116,10 +115,10 @@ int ft8_decode(void)
 
 		if (!found && num_decoded < DECODED_MESSAGE_COUNT)
 		{
-			// Ignore 'spaceship' callsigns
+			// Ignore 'spaceship' call signs
 			if (field1[0] == '<')
 				continue;
-			// Also ignore callsigns that are too large
+			// Also ignore call signs that are too large
 			if (field2[0] == '<' || strlen(field2) >= CALL_SIZE)
 				continue;
 			// Also ignore locators that are too large
@@ -223,7 +222,6 @@ void clear_log_stored_data(void)
 
 int Check_Calling_Stations(int num_decoded, int reply_state)
 {
-
 	int Beacon_Reply_Status = 0;
 
 	for (int i = 0; i < num_decoded; i++)
@@ -316,7 +314,6 @@ int Check_Calling_Stations(int num_decoded, int reply_state)
 
 void process_selected_Station(int stations_decoded, int TouchIndex)
 {
-
 	if (stations_decoded > 0 && TouchIndex <= stations_decoded)
 	{
 		memcpy(Target_Call, new_decoded[TouchIndex].field2, CALL_SIZE);

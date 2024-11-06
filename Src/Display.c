@@ -84,7 +84,8 @@ void update_log_display(int mode)
 	}
 }
 
-const char blank[MESSAGE_SIZE] = "                    ";
+const char blank[MESSAGE_SIZE] = "                   @";
+//                                12345678901234567890-
 
 void clear_log_messages(void)
 {

@@ -37,17 +37,14 @@
 #include "stm32f7xx_hal_tim.h"
 #include "Codec_Gains.h"
 #include "button.h"
-
 #include "decode_ft8.h"
 #include "gen_ft8.h"
-#include "log_file.h"
 #include "traffic_manager.h"
 #include "button.h"
 #include "DS3231.h"
-
 #include "SiLabs.h"
-
 #include "options.h"
+#include "ADIF_Export_File.h"
 
 #define ARM_MATH_CM7
 

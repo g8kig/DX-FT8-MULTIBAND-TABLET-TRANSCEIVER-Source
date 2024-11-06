@@ -5,6 +5,7 @@
  *      Author: user
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -15,8 +16,7 @@
 #include "constants.h"
 
 #include "gen_ft8.h"
-
-#include <stdio.h>
+#include "ADIF_Export_File.h"
 
 #include "ff.h"		/* Declarations of FatFs API */
 #include "diskio.h" /* Declarations of device I/O functions */
@@ -30,10 +30,8 @@
 #include "sd_diskio.h"
 
 #include "arm_math.h"
-#include <string.h>
 #include "decode_ft8.h"
 #include "Display.h"
-#include "log_file.h"
 #include "traffic_manager.h"
 #include "ADIF.h"
 
@@ -61,8 +59,8 @@ const char seventy_three[] = "RR73";
 
 void set_cq(void)
 {
-	const uint8_t blank[3 + CALL_SIZE + LOCATOR_SIZE] = "               ";
-	//													 CQ 12CALL 1LOCR0
+	const uint8_t blank[3 + CALL_SIZE + LOCATOR_SIZE] = "              }";
+	//													 CQ 12CALL 1LOCR-
 	char message[sizeof(CQ) + CALL_SIZE + LOCATOR_SIZE];
 	uint8_t packed[K_BYTES];
 
@@ -87,7 +85,7 @@ static int in_range(int num, int min, int max)
 	return num;
 }
 
-const uint8_t msg_blank[MESSAGE_SIZE] = "               ";
+const uint8_t msg_blank[MESSAGE_SIZE] = "              ]";
 //                                       1234567890123^1234567890123^123456^10
 
 void set_reply(uint16_t index)
@@ -98,7 +96,9 @@ void set_reply(uint16_t index)
 	itoa(in_range(Target_RSL, -999, 9999), RSL, 10);
 
 	if (index == 0)
+	{
 		sprintf(reply_message, "%s %s %s", Target_Call, Station_Call, RSL);
+	}
 	else if (index == 1)
 	{
 		sprintf(reply_message, "%s %s %s", Target_Call, Station_Call, seventy_three);
@@ -142,7 +142,6 @@ void compose_messages(void)
 
 void que_message(int index)
 {
-
 	uint8_t packed[K_BYTES];
 
 	pack77(xmit_messages[index].m, packed);
@@ -177,24 +176,26 @@ void clear_xmit_messages(void)
 
 void Read_Station_File(void)
 {
-
-	uint8_t i;
 	char read_buffer[BUFFER_SIZE] = {0};
 
 	f_mount(&FS, SDPath, 1);
 	if (f_open(&fil, "StationData.txt", FA_OPEN_ALWAYS | FA_READ) == FR_OK)
 	{
-		char *Station_Data;
-
 		f_lseek(&fil, 0);
 		f_gets(read_buffer, BUFFER_SIZE - 1, &fil);
-		i = strlen(read_buffer);
+		int i = strlen(read_buffer);
 		read_buffer[i] = 0;
 
-		Station_Data = strtok(read_buffer, ":");
-		strcpy(Station_Call, Station_Data);
-		Station_Data = strtok(NULL, ":");
-		strcpy(Locator, Station_Data);
+		char *Station_Data = strtok(read_buffer, ":");
+		if (Station_Data != NULL)
+		{
+			strcpy(Station_Call, Station_Data);
+			Station_Data = strtok(NULL, ":");
+			if (Station_Data != NULL)
+			{
+				strcpy(Locator, Station_Data);
+			}
+		}
 
 		f_close(&fil);
 	}
@@ -202,14 +203,12 @@ void Read_Station_File(void)
 
 void clear_reply_message_box(void)
 {
-
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 	BSP_LCD_FillRect(240, 40, 240, 215);
 }
 
 void SD_Initialize(void)
 {
-
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_SetTextColor(LCD_COLOR_RED);
 

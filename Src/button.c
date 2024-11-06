@@ -5,9 +5,10 @@
  *      Author: user
  */
 
-#include <Display.h>
-#include "defines.h"
 #include <stdlib.h>
+#include <Display.h>
+
+#include "defines.h"
 #include "button.h"
 #include "stm32746g_discovery_lcd.h"
 #include "SDR_Audio.h"
@@ -16,12 +17,12 @@
 #include "main.h"
 #include "stm32fxxx_hal.h"
 #include "Process_DSP.h"
-#include "log_file.h"
 #include "gen_ft8.h"
 #include "traffic_manager.h"
 #include "DS3231.h"
 #include "SiLabs.h"
 #include "options.h"
+#include <ADIF_Export_File.h>
 
 #define FFT_Resolution 6.25 // 8000/2/1280
 
@@ -547,10 +548,10 @@ void executeButton(uint16_t index)
 		if (sButtonData[4].state == 1)
 		{
 			make_File_Name();
-			Open_Log_File();
+			Open_ADIF_Export_File();
 		}
 		else
-			Close_Log_File();
+			Close_ADIF_Export_File();
 		break;
 
 	case 5:
@@ -589,7 +590,7 @@ void executeButton(uint16_t index)
 
 	case 9: // Raise Freq
 		if (cursor <= (ft8_buffer - ft8_min_bin - 2))
-		{ // limits highest NCO frequency to 3875 hz
+		{   // limits highest NCO frequency to 3875 hz
 			cursor++;
 			NCO_Frequency = (double)(cursor + ft8_min_bin) * FFT_Resolution;
 		}
@@ -621,9 +622,7 @@ void executeButton(uint16_t index)
 		show_wide(380, 0, start_freq);
 
 		sprintf(display_frequency, "%s", sBand_Data[BandIndex].display);
-
 		set_Rcvr_Freq();
-		HAL_Delay(10);
 
 		sButtonData[13].state = 1;
 		drawButton(13);

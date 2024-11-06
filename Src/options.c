@@ -1,4 +1,7 @@
-#include <Display.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "Display.h"
 #include "defines.h"
 #include "options.h"
 #include "SDR_Audio.h"
@@ -6,31 +9,24 @@
 #include "main.h"
 #include "button.h"
 #include "DS3231.h"
-
 #include "stm32fxxx_hal.h"
-#include "stdio.h"
-
 #include "ff.h"		/* Declarations of FatFs API */
 #include "diskio.h" /* Declarations of device I/O functions */
-
 #include "stm32746g_discovery_sd.h"
 #include "stm32746g_discovery.h"
-
 #include "ff_gen_drv.h"
 #include "sd_diskio.h"
-
 #include "DS3231.h"
-#include "log_file.h"
-
-#include "stdlib.h"
+#include "ADIF_Export_File.h"
 
 /* Fatfs structure */
-FATFS SDFatFs;			   /* File system object for SD card logical drive */
-FIL MyFile;				   /* File object */
+static FATFS SDFatFs;			   /* File system object for SD card logical drive */
+static FIL OptionFile;			   /* File object */
+
 char SDPath[SD_PATH_SIZE]; /* SD card logical drive path */
 
 // Order must match OptionNumber in options.h
-OptionStruct s_optionsData[] = {{
+static OptionStruct s_optionsData[] = {{
 	/*Name*/ "  Band_Index ", // opt0
 	/*Init*/ 0,
 	/*Min */ 0,
@@ -56,10 +52,10 @@ void Options_Initialize(void)
 
 	fres = f_mount(&SDFatFs, SDPath, 1);
 
-	fres = f_open(&MyFile, "SaveParams.txt", FA_READ);
+	fres = f_open(&OptionFile, "SaveParams.txt", FA_READ);
 	if (fres == FR_OK)
 	{
-		f_close(&MyFile);
+		f_close(&OptionFile);
 		Options_ReadFromMicroSD();
 	}
 	else
@@ -104,38 +100,34 @@ void Options_ReadFromMicroSD(void)
 	}
 }
 
-void Options_StoreValue(int optionIdx)
+void Options_StoreValue(int16_t optionIdx)
 {
-	int16_t option_value;
-	option_value = Options_GetValue(optionIdx);
-	Write_Int_MicroSD((int16_t)optionIdx, option_value);
+	int16_t option_value = Options_GetValue(optionIdx);
+	Write_Int_MicroSD(optionIdx, option_value);
 }
 
 // Routine to write a integer value to the MicroSD starting at MicroSD address MicroSD_Addr
 void Write_Int_MicroSD(uint16_t DiskBlock, int16_t value)
 {
-
-	char read_buffer[BUFFER_SIZE] = {0};
+	char write_buffer[BUFFER_SIZE] = {0};
 
 	f_mount(&SDFatFs, SDPath, 1);
-	f_open(&MyFile, "SaveParams.txt", FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
-	HAL_Delay(1);
-	f_lseek(&MyFile, DiskBlock * 32);
-	sprintf(read_buffer, "%2i", value);
-	f_puts(read_buffer, &MyFile);
-	f_close(&MyFile);
+	f_open(&OptionFile, "SaveParams.txt", FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
+	f_lseek(&OptionFile, DiskBlock * 32);
+	sprintf(write_buffer, "%2i", value);
+	f_puts(write_buffer, &OptionFile);
+	f_close(&OptionFile);
 }
 
 int16_t Read_Int_MicroSD(uint16_t DiskBlock)
 {
-	int16_t result = 0;
 	char read_buffer[BUFFER_SIZE];
 
 	f_mount(&SDFatFs, SDPath, 1);
-	f_open(&MyFile, "SaveParams.txt", FA_READ);
-	f_lseek(&MyFile, DiskBlock * 32);
-	f_gets(read_buffer, 32, &MyFile);
-	result = atoi(read_buffer);
-	f_close(&MyFile);
+	f_open(&OptionFile, "SaveParams.txt", FA_READ);
+	f_lseek(&OptionFile, DiskBlock * 32);
+	f_gets(read_buffer, 32, &OptionFile);
+	int16_t result = atoi(read_buffer);
+	f_close(&OptionFile);
 	return result;
 }

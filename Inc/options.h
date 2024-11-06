@@ -36,7 +36,7 @@ void Options_WriteToMicroSD(void);
 void Options_ReadFromMicroSD(void);
 void Options_ResetToDefaults(void);
 void Options_Initialize(void);
-void Options_StoreValue(int optionIdx);
+void Options_StoreValue(int16_t optionIdx);
 void SD_Initialize(void);
 
 #endif /* OPTIONS_H_ */

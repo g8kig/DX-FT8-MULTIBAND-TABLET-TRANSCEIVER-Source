@@ -245,23 +245,20 @@ void display_Real_Date(int x, int y)
 
 void make_Real_Time(void)
 {
-
 	getTime(&rtc_hour, &rtc_minute, &rtc_second, &rtc_ampm, _24_hour_format);
-	sprintf((char *)log_rtc_time_string, "%02i%02i%02i", rtc_hour, rtc_minute,
+	sprintf(log_rtc_time_string, "%02i%02i%02i", rtc_hour, rtc_minute,
 			rtc_second);
 }
 
 void make_Real_Date(void)
 {
-
 	getDate(&rtc_dow, &rtc_date, &rtc_month, &rtc_year);
-	sprintf((char *)log_rtc_date_string, "20%02i%02i%02i", rtc_year,
+	sprintf(log_rtc_date_string, "20%02i%02i%02i", rtc_year,
 			rtc_month, rtc_date);
 }
 
 void make_File_Name(void)
 {
-
 	make_Real_Date();
 	sprintf((char *)file_name_string, "%s.adi", log_rtc_date_string);
 }
