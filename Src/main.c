@@ -127,18 +127,14 @@ int main(void)
 
 	while (1)
 	{
-
 		if (DSP_Flag == 1)
 		{
-
 			I2S2_RX_ProcessBuffer(buff_offset);
 
 			if (xmit_flag == 1)
 			{
-
 				if (ft8_xmit_delay >= 20)
 				{
-
 					if (Tune_On == 0)
 					{
 						if (ft8_xmit_counter < 79)
@@ -188,20 +184,21 @@ int main(void)
 			DSP_Flag = 0;
 		}
 
-		int num_decoded = 0;
+		static int master_decoded = 0;
 		if (decode_flag == 1 && Tune_On == 0 && xmit_flag == 0)
 		{
 			update_slot_status();
 
-			num_decoded = ft8_decode();
-			if (num_decoded > 0)
+			master_decoded = ft8_decode();
+
+			if (master_decoded > 0)
 			{
-				display_messages(num_decoded);
+				display_messages(master_decoded);
 				if (Beacon_On == 1)
-					service_Beacon_mode(num_decoded);
+					service_Beacon_mode(master_decoded);
 				else 
 				if (Beacon_On == 0)
-					service_QSO_mode(num_decoded, 0);
+					service_QSO_mode(master_decoded, 0);
 			}
 
 			decode_flag = 0;
@@ -211,7 +208,7 @@ int main(void)
 			Process_Touch();
 
 		if (Tune_On == 0 && FT8_Touch_Flag == 1 && Beacon_On == 0)
-			process_selected_Station(num_decoded, FT_8_TouchIndex);
+			process_selected_Station(master_decoded, FT_8_TouchIndex);
 
 		update_synchronization();
 	}
@@ -244,7 +241,6 @@ void update_synchronization(void)
 
 void update_slot_status(void)
 {
-
 	if (slot_state == 0)
 		slot_state = 1;
 	else
