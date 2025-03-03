@@ -393,7 +393,7 @@ ButtonStruct sButtonData[NumButtons] = {
 	 /*w*/ button_width,
 	 /*h*/ 30},
 
-	{// button 28 Save  RTC Date
+	{// button 28 Save RTC Date
 	 /*text0*/ "Set ",
 	 /*text1*/ "Set ",
 	 /*blank*/ "    ",
@@ -441,9 +441,9 @@ ButtonStruct sButtonData[NumButtons] = {
 	 /*w*/ button_width,
 	 /*h*/ 30},
 
-	{// button 32 CQ SOTA
-	 /*text0*/ "QRPP",
-	 /*text1*/ "QRPP",
+	{// button 32 CQ DX
+	 /*text0*/ " DX ",
+	 /*text1*/ " DX ",
 	 /*blank*/ "    ",
 	 /*Active*/ 1,
 	 /*Displayed*/ 1,
@@ -547,7 +547,7 @@ static void toggle_button_state(int button)
 	drawButton(button);
 }
 
-static void reset_buttons(int btn1, int btn2, int btn3, const char *button_text)
+static void reset_buttons(int btn1, int btn2, int btn3, int btn4, const char *button_text)
 {
 	sButtonData[btn1].state = 0;
 	drawButton(btn1);
@@ -555,6 +555,8 @@ static void reset_buttons(int btn1, int btn2, int btn3, const char *button_text)
 	drawButton(btn2);
 	sButtonData[btn3].state = 0;
 	drawButton(btn3);
+	sButtonData[btn4].state = 0;
+	drawButton(btn4);
 	sButtonData[CQFree].text0 = (char *)button_text;
 	drawButton(CQFree);
 }
@@ -722,32 +724,40 @@ void executeButton(uint16_t index)
 	case StandardCQ:
 		if (sButtonData[StandardCQ].state)
 		{
-			CQ_Mode_Index = 0;
-			reset_buttons(CQSOTA, CQPOTA, QRPP, " CQ ");
+			CQ_Mode_Index = index - StandardCQ;
+			reset_buttons(CQSOTA, CQPOTA, QRP, DX, " CQ ");
 		}
 		break;
 
 	case CQSOTA:
 		if (sButtonData[CQSOTA].state)
 		{
-			CQ_Mode_Index = 1;
-			reset_buttons(StandardCQ, CQPOTA, QRPP, "SOTA");
+			CQ_Mode_Index = index - StandardCQ;
+			reset_buttons(StandardCQ, CQPOTA, QRP, DX, "SOTA");
 		}
 		break;
 
 	case CQPOTA:
 		if (sButtonData[CQPOTA].state)
 		{
-			CQ_Mode_Index = 2;
-			reset_buttons(StandardCQ, CQSOTA, QRPP, "POTA");
+			CQ_Mode_Index = index - StandardCQ;
+			reset_buttons(StandardCQ, CQSOTA, QRP, DX, "POTA");
 		}
 		break;
 
-	case QRPP:
-		if (sButtonData[QRPP].state)
+	case QRP:
+		if (sButtonData[QRP].state)
 		{
-			CQ_Mode_Index = 3;
-			reset_buttons(StandardCQ, CQSOTA, CQPOTA, "QRPP");
+			CQ_Mode_Index = index - StandardCQ;
+			reset_buttons(StandardCQ, CQSOTA, CQPOTA, DX, "QRP ");
+		}
+		break;
+
+	case DX:
+		if (sButtonData[DX].state)
+		{
+			CQ_Mode_Index = index - StandardCQ;
+			reset_buttons(StandardCQ, CQSOTA, CQPOTA, QRP, " DX ");
 		}
 		break;
 

@@ -108,7 +108,8 @@ enum ButtonIds
 	StandardCQ,
 	CQSOTA,
 	CQPOTA,
-	QRPP,
+	QRP,
+	DX,
 	FreeText1,
 	FreeText2,
 	NumButtons = 35

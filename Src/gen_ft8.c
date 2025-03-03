@@ -60,13 +60,14 @@ static uint8_t isInitialized = 0;
 static FATFS FS;
 static FIL fil;
 
-static char blank[19];
+static char blank[MESSAGE_SIZE];
 static uint8_t blank_initialised = 0;
 
 const char CQ[] = "CQ";
 const char SOTA[] = "SOTA";
 const char POTA[] = "POTA";
 const char QRP[] = "QRP";
+const char DX[] = "DX";
 const char Beacon_seventy_three[] = "RR73";
 const char QSO_seventy_three[] = "73";
 
@@ -94,6 +95,9 @@ void set_cq(void)
 			break;
 		case 3:
 			mode = QRP;
+			break;
+		case 4:
+			mode = DX;
 			break;
 		}
 

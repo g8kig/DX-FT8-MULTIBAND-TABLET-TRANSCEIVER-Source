@@ -32,7 +32,7 @@ char current_QSO_xmit_message[];
 const int max_log_messages = 8;
 display_message log_messages[8];
 
-static char blank[21];
+static char blank[MESSAGE_SIZE];
 static uint8_t blank_initialised = 0;
 
 void update_log_display(int mode)
@@ -43,19 +43,19 @@ void update_log_display(int mode)
 		log_messages[i].text_color = log_messages[i + 1].text_color;
 	}
 
-	if (mode == 0)
-	{
-		strcpy(log_messages[max_log_messages - 1].message,
-			   current_QSO_receive_message);
-		log_messages[max_log_messages - 1].text_color = 0;
-	}
-	else if (mode == 1)
+	if (mode == 1)
 	{
 		strcpy(log_messages[max_log_messages - 1].message,
 			   current_QSO_xmit_message);
 		log_messages[max_log_messages - 1].text_color = 1;
 	}
-
+	else
+	{
+		strcpy(log_messages[max_log_messages - 1].message,
+			   current_QSO_receive_message);
+		log_messages[max_log_messages - 1].text_color = 0;
+	}
+ 
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 	BSP_LCD_FillRect(log_start, 40, log_width, 160);
 
@@ -63,10 +63,10 @@ void update_log_display(int mode)
 
 	for (int i = 0; i < max_log_messages; i++)
 	{
-		if (log_messages[i].text_color == 0)
-			BSP_LCD_SetTextColor(LCD_COLOR_RED);
-		else if (log_messages[i].text_color == 1)
+		if (log_messages[i].text_color == 1)
 			BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
+		else
+			BSP_LCD_SetTextColor(LCD_COLOR_RED);
 
 		BSP_LCD_DisplayStringAt(log_start, 40 + i * 20,
 								(const uint8_t *)log_messages[i].message, LEFT_MODE);
@@ -96,18 +96,18 @@ void update_Beacon_log_display(int mode)
 			Beacon_log_messages[i + 1].text_color;
 	}
 
-	if (mode == 0)
-	{
-		strcpy(Beacon_log_messages[max_Beacon_log_messages - 1].message,
-			   current_Beacon_receive_message);
-		Beacon_log_messages[max_Beacon_log_messages - 1].text_color = 0;
-	}
-	else if (mode == 1)
+	if (mode == 1)
 	{
 		strcpy(Beacon_log_messages[max_Beacon_log_messages - 1].message,
 			   current_Beacon_xmit_message);
 		Beacon_log_messages[max_Beacon_log_messages - 1].text_color = 1;
 	}
+	else
+	{
+		strcpy(Beacon_log_messages[max_Beacon_log_messages - 1].message,
+			   current_Beacon_receive_message);
+		Beacon_log_messages[max_Beacon_log_messages - 1].text_color = 0;
+	} 
 
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 	BSP_LCD_FillRect(log_start, 40, log_width, 200);
@@ -115,10 +115,10 @@ void update_Beacon_log_display(int mode)
 
 	for (int i = 0; i < max_Beacon_log_messages; i++)
 	{
-		if (Beacon_log_messages[i].text_color == 0)
-			BSP_LCD_SetTextColor(LCD_COLOR_RED);
-		else if (Beacon_log_messages[i].text_color == 1)
+		if (Beacon_log_messages[i].text_color == 1)
 			BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
+		else
+			BSP_LCD_SetTextColor(LCD_COLOR_RED);
 
 		BSP_LCD_DisplayStringAt(log_start, 40 + i * 20,
 								(const uint8_t *)Beacon_log_messages[i].message, LEFT_MODE);
@@ -167,10 +167,10 @@ void show_UTC_time(uint16_t x, uint16_t y, int utc_hours, int utc_minutes,
 			utc_seconds);
 	BSP_LCD_SetFont(&Font16);
 
-	if (color == 0)
-		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-	else if (color == 1)
+	if (color == 1)
 		BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
+	else
+		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 
 	BSP_LCD_DisplayStringAt(x, y, (const uint8_t *)rtc_time_string, LEFT_MODE);
 }
