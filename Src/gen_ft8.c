@@ -63,7 +63,6 @@ static FIL fil;
 static char blank[MESSAGE_SIZE];
 static uint8_t blank_initialised = 0;
 
-const char CQ[] = "CQ";
 const char SOTA[] = "SOTA";
 const char POTA[] = "POTA";
 const char QRP[] = "QRP";
@@ -85,29 +84,29 @@ void set_cq(void)
 		switch (CQ_Mode_Index)
 		{
 		default:
-		case 0:
+		case CQ:
 			break;
-		case 1:
+		case CQSOTA:
 			mode = SOTA;
 			break;
-		case 2:
+		case CQPOTA:
 			mode = POTA;
 			break;
-		case 3:
+		case CQQRP:
 			mode = QRP;
 			break;
-		case 4:
+		case CQDX:
 			mode = DX;
 			break;
 		}
 
 		if (mode == NULL)
 		{
-			sprintf(message, "%s %s %s", CQ, Station_Call, Locator);
+			sprintf(message, "CQ %s %s", Station_Call, Locator);
 		}
 		else
 		{
-			sprintf(message, "%s %s %s %s", CQ, mode, Station_Call, Locator);
+			sprintf(message, "CQ %s %s %s", mode, Station_Call, Locator);
 		}
 	}
 	else

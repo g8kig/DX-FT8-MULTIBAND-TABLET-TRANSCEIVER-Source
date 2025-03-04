@@ -414,7 +414,7 @@ ButtonStruct sButtonData[NumButtons] = {
 	 /*state*/ 1,
 	 /*x*/ 240,
 	 /*y*/ 150,
-	 /*w*/ button_width,
+	 /*w*/ button_mode_width,
 	 /*h*/ 30},
 
 	{// button 30 CQ SOTA
@@ -424,9 +424,9 @@ ButtonStruct sButtonData[NumButtons] = {
 	 /*Active*/ 1,
 	 /*Displayed*/ 1,
 	 /*state*/ 0,
-	 /*x*/ 300,
+	 /*x*/ 293,
 	 /*y*/ 150,
-	 /*w*/ button_width,
+	 /*w*/ button_bar_width,
 	 /*h*/ 30},
 
 	{// button 31 CQ POTA
@@ -436,24 +436,36 @@ ButtonStruct sButtonData[NumButtons] = {
 	 /*Active*/ 1,
 	 /*Displayed*/ 1,
 	 /*state*/ 0,
-	 /*x*/ 360,
+	 /*x*/ 345,
 	 /*y*/ 150,
-	 /*w*/ button_width,
+	 /*w*/ button_bar_width,
 	 /*h*/ 30},
 
-	{// button 32 CQ DX
+	 {// button 32 CQ QRP
+	 /*text0*/ "QRP",
+	 /*text1*/ "QRP",
+	 /*blank*/ "    ",
+	 /*Active*/ 1,
+	 /*Displayed*/ 1,
+	 /*state*/ 0,
+	 /*x*/ 397,
+	 /*y*/ 150,
+	 /*w*/ button_mode_width-35,
+	 /*h*/ 30},
+
+	 {// button 33 CQ DX
 	 /*text0*/ " DX ",
 	 /*text1*/ " DX ",
 	 /*blank*/ "    ",
 	 /*Active*/ 1,
 	 /*Displayed*/ 1,
 	 /*state*/ 0,
-	 /*x*/ 420,
+	 /*x*/ 440,
 	 /*y*/ 150,
-	 /*w*/ button_width,
+	 /*w*/ button_mode_width-15,
 	 /*h*/ 30},
 
-	{// button 33 Free Text 1
+	{// button 34 Free Text 1
 	 /*text0*/ "Free1",
 	 /*text1*/ "Free1",
 	 /*blank*/ "    ",
@@ -465,7 +477,7 @@ ButtonStruct sButtonData[NumButtons] = {
 	 /*w*/ 160,
 	 /*h*/ 30},
 
-	{// button 34 Free Text 2
+	{// button 35 Free Text 2
 	 /*text0*/ "Free2",
 	 /*text1*/ "Free2",
 	 /*blank*/ "    ",
@@ -547,16 +559,19 @@ static void toggle_button_state(int button)
 	drawButton(button);
 }
 
-static void reset_buttons(int btn1, int btn2, int btn3, int btn4, const char *button_text)
+static void reset_buttons(int selectedIndex, const char *button_text)
 {
-	sButtonData[btn1].state = 0;
-	drawButton(btn1);
-	sButtonData[btn2].state = 0;
-	drawButton(btn2);
-	sButtonData[btn3].state = 0;
-	drawButton(btn3);
-	sButtonData[btn4].state = 0;
-	drawButton(btn4);
+	const uint16_t buttonIndexes[] = {CQ, CQSOTA, CQPOTA, CQQRP, CQDX};
+	for (uint16_t idx = 0; idx < sizeof(buttonIndexes)/sizeof(buttonIndexes[0]); ++idx)
+	{
+		uint16_t currentIndex = buttonIndexes[idx];
+		if (currentIndex != selectedIndex)
+		{
+			sButtonData[currentIndex].state = 0;
+			drawButton(currentIndex);
+		}
+	}
+
 	sButtonData[CQFree].text0 = (char *)button_text;
 	drawButton(CQFree);
 }
@@ -721,43 +736,43 @@ void executeButton(uint16_t index)
 		toggle_button_state(SaveRTCDate);
 		break;
 
-	case StandardCQ:
-		if (sButtonData[StandardCQ].state)
+	case CQ:
+		if (sButtonData[CQ].state)
 		{
-			CQ_Mode_Index = index - StandardCQ;
-			reset_buttons(CQSOTA, CQPOTA, QRP, DX, " CQ ");
+			CQ_Mode_Index = CQ;
+			reset_buttons(CQ, " CQ ");
 		}
 		break;
 
 	case CQSOTA:
 		if (sButtonData[CQSOTA].state)
 		{
-			CQ_Mode_Index = index - StandardCQ;
-			reset_buttons(StandardCQ, CQPOTA, QRP, DX, "SOTA");
+			CQ_Mode_Index = CQSOTA;
+			reset_buttons(CQSOTA, "SOTA");
 		}
 		break;
 
 	case CQPOTA:
 		if (sButtonData[CQPOTA].state)
 		{
-			CQ_Mode_Index = index - StandardCQ;
-			reset_buttons(StandardCQ, CQSOTA, QRP, DX, "POTA");
+			CQ_Mode_Index = CQPOTA;
+			reset_buttons(CQPOTA, "POTA");
 		}
 		break;
 
-	case QRP:
-		if (sButtonData[QRP].state)
+	case CQQRP:
+		if (sButtonData[CQQRP].state)
 		{
-			CQ_Mode_Index = index - StandardCQ;
-			reset_buttons(StandardCQ, CQSOTA, CQPOTA, DX, "QRP ");
+			CQ_Mode_Index = CQQRP;
+			reset_buttons(CQQRP, "QRP ");
 		}
 		break;
 
-	case DX:
-		if (sButtonData[DX].state)
+	case CQDX:
+		if (sButtonData[CQDX].state)
 		{
-			CQ_Mode_Index = index - StandardCQ;
-			reset_buttons(StandardCQ, CQSOTA, CQPOTA, QRP, " DX ");
+			CQ_Mode_Index = CQDX;
+			reset_buttons(CQDX, " DX ");
 		}
 		break;
 
@@ -905,7 +920,7 @@ void setup_Cal_Display(void)
 
 	drawButton(SaveRTCDate);
 
-	for (int button = StandardCQ; button <= FreeText2; ++button)
+	for (int button = CQ; button <= FreeText2; ++button)
 	{
 		sButtonData[button].Active = 1;
 		drawButton(button);
@@ -930,7 +945,7 @@ void erase_Cal_Display(void)
 		sButtonData[button].Active = 0;
 	}
 
-	for (int button = StandardCQ; button <= FreeText2; ++button){
+	for (int button = CQ; button <= FreeText2; ++button){
 		sButtonData[button].Active = 0;
 		drawButton(button);
 	}

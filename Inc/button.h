@@ -21,6 +21,7 @@
 
 #define button_width 60
 #define button_bar_width 55
+#define button_mode_width 45
 
 #define line0 10
 #define line1 210
@@ -105,14 +106,14 @@ enum ButtonIds
 	YearDown,
 	YearUp,
 	SaveRTCDate,
-	StandardCQ,
+	CQ,
 	CQSOTA,
 	CQPOTA,
-	QRP,
-	DX,
+	CQQRP,
+	CQDX,
 	FreeText1,
 	FreeText2,
-	NumButtons = 35
+	NumButtons = 36
 };
 
 extern int Tune_On; // 0 = Receive, 1 = Xmit Tune Signal
