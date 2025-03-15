@@ -95,15 +95,14 @@ int ft8_decode(void)
 			continue;
 
 		char message[14 + 14 + 7 + 1];
-
+		ftx_message_rc_t rc_decode = ftx_message_decode(a91, hash_if, &message);
+		CHECK(rc_decode == FTX_MESSAGE_RC_OK);
+	
 		char call_to[14];
 		char call_from[14];
 		char locator[7];
-		int rc = unpack77_fields(a91, call_to, call_from, locator);
-		if (rc < 0)
-			continue;
-
-		sprintf(message, "%s %s %s ", call_to, call_from, locator);
+		
+		unpack_message(message, call_to, call_from, locator);
 
 		_Bool found = false;
 		for (int i = 0; i < num_decoded; ++i)

@@ -77,7 +77,6 @@ static char Free_Text2[MESSAGE_SIZE];
 void set_cq(void)
 {
 	char message[MESSAGE_SIZE];
-	uint8_t packed[K_BYTES];
 	if (Free_Index == 0)
 	{
 		const char *mode = NULL;
@@ -122,8 +121,15 @@ void set_cq(void)
 		}
 	}
 
-	pack77(message, packed);
-	genft8(packed, tones);
+    ftx_message_t msg;
+    ftx_message_init(&msg);
+
+    ftx_message_rc_t rc_encode = ftx_message_encode(&msg, hash_if, message);
+	if (rc_encode == FTX_MESSAGE_OK)
+	{
+	}
+	
+	ft8_encode(packed.payload, tones);
 
 	string_init(blank, sizeof(blank), &blank_initialised, ' ');
 	BSP_LCD_SetFont(&Font16);
@@ -144,7 +150,6 @@ static int in_range(int num, int min, int max)
 
 void set_reply(uint16_t index)
 {
-	uint8_t packed[K_BYTES];
 	char RSL[5];
 
 	if (index == 1)
@@ -163,8 +168,16 @@ void set_reply(uint16_t index)
 	strcpy(current_Beacon_xmit_message, reply_message);
 	update_Beacon_log_display(1);
 
-	pack77(reply_message, packed);
-	genft8(packed, tones);
+    ftx_message_t msg;
+    ftx_message_init(&msg);
+
+    ftx_message_rc_t rc_encode = ftx_message_encode(&msg, hash_if, message);
+	if (rc_encode == FTX_MESSAGE_RC_OK)
+	{
+
+	}
+
+	ft8_encode(packed.payload, tones);
 
 	string_init(blank, sizeof(blank), &blank_initialised, ' ');
 	BSP_LCD_SetFont(&Font16);
@@ -192,10 +205,16 @@ void compose_messages(void)
 
 void que_message(int index)
 {
-	uint8_t packed[K_BYTES];
+    ftx_message_t msg;
+    ftx_message_init(&msg);
 
-	pack77(xmit_messages[index], packed);
-	genft8(packed, tones);
+    ftx_message_rc_t rc_encode = ftx_message_encode(&msg, hash_if, xmit_messages[index]);
+	if (rc_encode == FTX_MESSAGE_RC_OK)
+	{
+
+	}
+
+	ft8_encode(packed.payload, tones);
 
 	string_init(blank, sizeof(blank), &blank_initialised, ' ');
 	BSP_LCD_SetFont(&Font16);
