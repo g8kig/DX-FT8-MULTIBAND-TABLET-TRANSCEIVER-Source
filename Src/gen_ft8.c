@@ -147,17 +147,25 @@ void set_reply(uint16_t index)
 	uint8_t packed[K_BYTES];
 	char RSL[5];
 
-	if (index == 1)
+	itoa(in_range(Target_RSL, -999, 9999), RSL, 10);
+	switch (index)
 	{
-		sprintf(reply_message, "%s %s %s", Target_Call, Station_Call,
-				Beacon_seventy_three);
+	case Reply_RSL:
+		sprintf(reply_message, "%s %s %s", Target_Call, Station_Call, RSL);
+		break;
+	case Reply_Beacon_73:
+		sprintf(reply_message, "%s %s %s", Target_Call, Station_Call, Beacon_seventy_three);
 		if (Station_RSL != 99)
 			write_ADIF_Log();
-	}
-	else
-	{
-		itoa(in_range(Target_RSL, -999, 9999), RSL, 10);
-		sprintf(reply_message, "%s %s %s", Target_Call, Station_Call, RSL);
+		break;
+	case Reply_R_RSL:
+		sprintf(reply_message, "%s %s R%s", Target_Call, Station_Call, RSL);
+		break;
+	case Reply_QSO_73:
+		sprintf(reply_message, "%s %s %s", Target_Call, Station_Call, QSO_seventy_three);
+		if (Station_RSL != 99)
+			write_ADIF_Log();
+		break;
 	}
 
 	strcpy(current_Beacon_xmit_message, reply_message);

@@ -12,6 +12,14 @@ extern int Auto_QSO_State;
 extern int Station_RSL;
 extern int Target_RSL;
 
+enum {
+    Got_Call = 0,
+    Got_Locator = 1,
+    Got_73,
+    Got_R,
+    Got_SNR
+};
+
 typedef struct
 {
     char call_to[14];   // call also be 'CQ'
@@ -24,6 +32,7 @@ typedef struct
     char target_locator[7];
     int slot;
     int RR73;
+    int sequence;
 } Decode;
 
 typedef struct
