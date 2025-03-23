@@ -442,8 +442,8 @@ ButtonStruct sButtonData[NumButtons] = {
 	 /*h*/ 30},
 
 	{// button 32 CQ SOTA
-	 /*text0*/ "QRPP",
-	 /*text1*/ "QRPP",
+	 /*text0*/ "QRP ",
+	 /*text1*/ "QRP ",
 	 /*blank*/ "    ",
 	 /*Active*/ 1,
 	 /*Displayed*/ 1,
