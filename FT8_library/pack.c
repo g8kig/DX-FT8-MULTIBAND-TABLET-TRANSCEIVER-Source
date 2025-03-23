@@ -19,10 +19,10 @@ static const char A3[11] = "0123456789";
 static const char A4[28] = " ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 static const char DE_[3] = "DE ";
-static const char QRP_[4] = "QRP ";
+static const char QRPP_[5] = "QRPP ";
 static const char CQ_SOTA_[8] = "CQ SOTA ";
 static const char CQ_POTA_[8] = "CQ POTA ";
-static const char CQ_QRP_[7] = "CQ QRP ";
+static const char CQ_QRPP_[8] = "CQ QRPP ";
 static const char CQ_DX_[6] = "CQ DX ";
 static const char CQ_[3] = "CQ ";
 static const char DX_[3] = "DX ";
@@ -45,15 +45,14 @@ int32_t pack28(const char* callsign)
         return 386456;
     if (memcmp(callsign, CQ_POTA_, sizeof(CQ_POTA_)) == 0)
         return 327407;
-    if (memcmp(callsign, CQ_QRP_, sizeof(CQ_QRP_)) == 0)
-        return 13898;
-        // return 349184; QRPP 
+    if (memcmp(callsign, CQ_QRPP_, sizeof(CQ_QRPP_)) == 0)
+        return 349184; // QRPP 
     if (memcmp(callsign, CQ_DX_, sizeof(CQ_DX_)) == 0)
         return 1135;
 
     if (memcmp(callsign, DE_, sizeof(DE_)) == 0)
         return 0;
-    if (memcmp(callsign, QRP_, sizeof(QRP_)) == 0)
+    if (memcmp(callsign, QRPP_, sizeof(QRPP_)) == 0)
         return 1;
     if (memcmp(callsign, CQ_, sizeof(CQ_)) == 0)
         return 2;
@@ -191,9 +190,9 @@ int pack77_1(const char* msg, uint8_t* b77)
     {
         s1 += sizeof(DX_);
     }
-    else if (memcmp(s1, QRP_, sizeof(QRP_)) == 0)
+    else if (memcmp(s1, QRPP_, sizeof(QRPP_)) == 0)
     {
-        s1 += sizeof(QRP_);
+        s1 += sizeof(QRPP_);
     }
     else if ((*s1 == POTA_[0] || *s1 == SOTA_[0]) && memcmp(s1 + 1, POTA_ + 1, sizeof(POTA_) - 1) == 0)
     {
