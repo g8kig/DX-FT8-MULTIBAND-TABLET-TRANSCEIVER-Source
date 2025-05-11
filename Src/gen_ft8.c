@@ -50,9 +50,9 @@ char reply_message_list[MESSAGE_SIZE][8];
 int reply_message_count;
 struct Arena *heap;
 
-const int display_start_x = 240;
+const int display_start_x = 264;
 const int display_start_y = 240;
-const int display_width = 230;
+const int display_width = 216;
 
 static uint8_t isInitialized = 0;
 
@@ -74,6 +74,8 @@ const char QSO_73[] = "73";
 int Free_Text_Max = 0;
 static char Free_Text1[MESSAGE_SIZE];
 static char Free_Text2[MESSAGE_SIZE];
+
+static void log_qsocalls(void);
 
 void set_cq(void)
 {
@@ -175,7 +177,10 @@ void set_reply(ReplyID replyId)
 	// fall through
 	case Reply_QSO_73:
 		if (Station_RSL != 99)
+		{
 			write_ADIF_Log();
+			log_qsocalls();
+		}
 		break;
 	}
 
@@ -225,7 +230,35 @@ void queue_message(QueID queId)
 	strcpy(current_QSO_xmit_message, tx_msg);
 
 	if (queId == Que_73 && Station_RSL != 99)
+	{
 		write_ADIF_Log();
+		log_qsocalls();
+	}
+}
+
+void log_qsocalls(void)
+{
+	if (Num_QSOCalls == 21)
+	{
+		for (int i = 1; i < Num_QSOCalls - 1; i++)
+		{
+			strcpy(QSOCalls[i - 1], QSOCalls[i]);
+		}
+
+		strcpy(QSOCalls[Num_QSOCalls - 1], Target_Call);
+	}
+	else
+	{
+		strcpy(QSOCalls[Num_QSOCalls++], Target_Call);
+	}
+
+//	if (f_open(&fil, "QSOCalls.txt", FA_OPEN_ALWAYS | FA_WRITE | FA_OPEN_APPEND) == FR_OK)
+//	{
+//		f_lseek(&fil, f_size(&fil));
+//		f_puts(Target_Call, &fil);
+//		f_puts(":", &fil);
+//		f_close(&fil);
+//	}
 }
 
 void clear_queued_message(void)

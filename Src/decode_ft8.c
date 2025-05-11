@@ -52,6 +52,8 @@ static int message_limit = 10;
 int Auto_QSO_State;
 int Target_RSL;
 
+static void log_all_decoded(int decoded_messages);
+
 int ft8_decode(void)
 {
 	// Find top candidates by Costas sync score and localize them in time and frequency
@@ -178,7 +180,7 @@ void display_messages(int decoded_messages)
 	const char *paramlist = "%s %s %s";
 
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-	BSP_LCD_FillRect(0, FFT_H, 240, 200);
+	BSP_LCD_FillRect(0, FFT_H, 264, 200);
 	BSP_LCD_SetFont(&Font16);
 
 	for (int i = 0; i < decoded_messages && i < message_limit; i++)
@@ -191,17 +193,17 @@ void display_messages(int decoded_messages)
 		{
 			if (strcmp(Station_Call, call_from) != 0)
 			{
-				sprintf(display[i].message, "%s %s %s %2i", call_to, call_from, locator, new_decoded[i].snr);
+				sprintf(display[i].message, "%s %s %s %2i %d", call_to, call_from, locator, new_decoded[i].snr, new_decoded[i].freq_hz);
 			}
 			else
 			{
-				sprintf(display[i].message, paramlist, call_to, call_from, locator);
+				sprintf(display[i].message, paramlist, call_to, call_from, locator, new_decoded[i].freq_hz);
 			}
 			display[i].text_color = 1;
 		}
 		else
 		{
-			sprintf(display[i].message, paramlist, call_to, call_from, locator);
+			sprintf(display[i].message, paramlist, call_to, call_from, locator, new_decoded[i].freq_hz);
 			display[i].text_color = 0;
 		}
 	}
@@ -216,10 +218,28 @@ void display_messages(int decoded_messages)
 	}
 }
 
+static void log_all_decoded(int decoded_messages)
+{
+	char myLog[9+9+3+3+1+14+14+7+3+6];
+	const char *myBand[] = {"40m", "30m", "20m", "17m", "15m", "12m", "10m"};
+	for (int i = 0; i < decoded_messages && i < message_limit; i++)
+	{
+		sprintf(myLog, "[%s %s][%s] %s %s %s %3i %d\n",
+			rtc_date_string, 
+			rtc_time_string, 
+			myBand[BandIndex], 
+			new_decoded[i].call_to, 
+			new_decoded[i].call_from, 
+			new_decoded[i].locator, 
+			new_decoded[i].snr, 
+			new_decoded[i].freq_hz);
+	}
+}
+
 void clear_messages(void)
 {
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-	BSP_LCD_FillRect(0, FFT_H, 240, 201);
+	BSP_LCD_FillRect(0, FFT_H, 264, 201);
 }
 
 static int validate_locator(const char locator[])

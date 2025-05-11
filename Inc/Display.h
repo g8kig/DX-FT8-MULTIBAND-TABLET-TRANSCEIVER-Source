@@ -8,11 +8,11 @@
 #ifndef DISPLAY_H_
 #define DISPLAY_H_
 
-#include	"arm_math.h"
+#include "arm_math.h"
 
-#define FFT_H  40
+#define FFT_H 40
 
-#define FFT_Resolution 6.25  //8000/2/1280
+#define FFT_Resolution 6.25 // 8000/2/1280
 
 extern int FT_8_TouchIndex;
 
@@ -24,6 +24,9 @@ extern int decode_flag;
 extern int QSO_Xmit_Touch;
 extern int FT8_Touch_Flag;
 
+extern int LoadQSOCall_Flag;
+extern int Num_QSOCalls;
+extern char QSOCalls[21][10];
 extern char current_QSO_receive_message[40];
 extern char current_Beacon_receive_message[40];
 extern char current_Beacon_xmit_message[40];
@@ -36,7 +39,7 @@ void show_short(uint16_t x, uint16_t y, uint8_t variable);
 void show_wide(uint16_t x, uint16_t y, int variable);
 
 void show_UTC_time(uint16_t x, uint16_t y, int utc_hours, int utc_minutes,
-		int utc_seconds, int color);
+				   int utc_seconds, int color);
 
 void show_Real_Date(uint16_t x, uint16_t y, int date, int month, int year);
 

@@ -9,13 +9,9 @@
 #include "decode_ft8.h"
 #include "WF_Table.h"
 
-//3/25/Flag
-
 #define FFT_X 0
 #define FFT_Y 1
 #define FFT_W (ft8_buffer - ft8_min_bin)
-
-
 
 int FT_8_TouchIndex;
 
@@ -25,8 +21,12 @@ char rtc_time_string[9];
 int decode_flag;
 int FT8_Touch_Flag;
 
-const int log_start = 240;
-const int log_width = 230;
+int LoadQSOCall_Flag = 0;
+int Num_QSOCalls = 0;
+char QSOCalls[21][10] = {0};
+
+const int log_start = 264;
+const int log_width = 216;
 
 static uint8_t WF_Bfr[FFT_H * FFT_W];
 
@@ -40,6 +40,8 @@ static uint8_t blank_initialised = 0;
 
 void update_log_display(int mode)
 {
+	char myLog[64];
+	const char *myBand[] = {"40m", "30m", "20m", "17m", "15m", "12m", "10m"};
 	for (int i = 0; i < max_log_messages - 1; i++)
 	{
 		strcpy(log_messages[i].message, log_messages[i + 1].message);
@@ -51,18 +53,22 @@ void update_log_display(int mode)
 		strcpy(log_messages[max_log_messages - 1].message,
 			   current_QSO_receive_message);
 		log_messages[max_log_messages - 1].text_color = 0;
+		sprintf(myLog, "[%s %s][%s] %s\n", rtc_date_string, rtc_time_string, myBand[BandIndex], current_QSO_receive_message);
 	}
 	else if (mode == 1)
 	{
 		strcpy(log_messages[max_log_messages - 1].message,
 			   current_QSO_xmit_message);
 		log_messages[max_log_messages - 1].text_color = 1;
+		sprintf(myLog, "[%s %s][%s] %s\n", rtc_date_string, rtc_time_string, myBand[BandIndex], current_QSO_xmit_message);
 	}
 
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 	BSP_LCD_FillRect(log_start, 40, log_width, 160);
 
 	BSP_LCD_SetFont(&Font16);
+
+	// f_puts(myLog, &QSOLog);
 
 	for (int i = 0; i < max_log_messages; i++)
 	{
@@ -76,9 +82,37 @@ void update_log_display(int mode)
 	}
 }
 
+void LoadQSOCall_display(void)
+{
+	if (Num_QSOCalls == 0)
+	{
+		BSP_LCD_DisplayStringAt(log_start, 40, (const uint8_t *)"No QSO", LEFT_MODE);
+	}
+	else
+	{
+		string_init(blank, sizeof(blank), &blank_initialised, ' ');
+
+		BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+		BSP_LCD_DisplayStringAt(log_start, 40, (const uint8_t *) blank, LEFT_MODE);
+		for (int i = 0, j = 0; i * 3 + j < Num_QSOCalls; j++)
+		{
+			if (j > 2)
+			{
+				j = 0;
+				i++;
+				BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+				BSP_LCD_DisplayStringAt(log_start, 40 + i * 20, (const uint8_t *) blank, LEFT_MODE);
+			}
+
+			BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
+			BSP_LCD_DisplayStringAt(log_start + j * 72, 40 + i * 20, (const uint8_t *)QSOCalls[i * 3 + j], LEFT_MODE);
+		}
+	}
+}
+
 void clear_log_messages(void)
 {
-	string_init(blank, sizeof(blank), &blank_initialised,' ');
+	string_init(blank, sizeof(blank), &blank_initialised, ' ');
 
 	for (int i = 0; i < max_log_messages; i++)
 		strcpy(log_messages[i].message, blank);
@@ -273,6 +307,15 @@ static uint8_t FT8_Touch(void)
 	return 0;
 }
 
+static int LoadQSOCall_Touch(void)
+{
+	if ((valx > 280 && valx < 480) && (valy > 80 && valy < 200))
+	{
+		return 1;
+	}
+	return 0;
+}
+
 void Process_Touch(void)
 {
 	static uint8_t touch_detected = 0;
@@ -294,7 +337,14 @@ void Process_Touch(void)
 			valx = (uint16_t)TS_State.touchX[0];
 			valy = (uint16_t)TS_State.touchY[0];
 
-			FT8_Touch_Flag = FT8_Touch();
+			if (FT8_Touch())
+			{
+				FT8_Touch_Flag = 1;
+			}
+			else if (LoadQSOCall_Touch() && !Tune_On)
+			{
+				LoadQSOCall_display();
+			}
 
 			touch_detected = 1;
 		}
