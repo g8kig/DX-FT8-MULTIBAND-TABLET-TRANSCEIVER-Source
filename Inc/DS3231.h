@@ -18,8 +18,6 @@ typedef struct
 	int8_t data;
 } RTCStruct;
 
-extern RTCStruct s_RTC_Data[];
-
 #define DS3231_Address              0x68
 
 #define DS3231_Read_addr            ((DS3231_Address << 1) | 0x01)
@@ -77,5 +75,7 @@ void display_RTC_TimeEdit(int x, int y);
 void display_RTC_DateEdit(int x, int y);
 void set_RTC_to_TimeEdit(void);
 void set_RTC_to_DateEdit(void);
+
+RTCStruct *get_rtc_data(int id);
 
 #endif /* DS3231_H_ */

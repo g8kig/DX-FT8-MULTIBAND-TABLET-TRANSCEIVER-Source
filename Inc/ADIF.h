@@ -10,6 +10,4 @@
 
 void write_ADIF_Log(void);
 
-#define RTC_STRING_SIZE 13
-
 #endif /* ADIF_H_ */

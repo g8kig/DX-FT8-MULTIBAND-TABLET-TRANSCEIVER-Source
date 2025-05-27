@@ -824,7 +824,7 @@ void executeButton(uint16_t index)
 
 static void processButton(int id, int isIncrement, int isDate)
 {
-	RTCStruct *data = &s_RTC_Data[id];
+	RTCStruct *data = get_rtc_data(id);
 	if (isIncrement ? data->data < data->Maximum : data->data > data->Minimum)
 	{
 		data->data = isIncrement ? data->data + 1 : data->data - 1;

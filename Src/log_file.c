@@ -42,7 +42,8 @@ static FATFS FS;
 static FIL LogFile;
 static char file_name[FILENAME_STRING_SIZE];
 
-static void make_File_Name(char *file_name) {
+static void make_File_Name(char *file_name)
+{
 	char date_string[RTC_STRING_SIZE];
 	make_Real_Date(date_string);
 	sprintf(file_name, "%s.adi", date_string);

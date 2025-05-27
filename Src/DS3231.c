@@ -13,71 +13,85 @@
 #include "log_file.h"
 
 static unsigned char rtc_hour, rtc_minute, rtc_second, rtc_dow, rtc_date, rtc_month,
-		rtc_year;
+	rtc_year;
 static short rtc_ampm;
 
-RTCStruct s_RTC_Data[] = { {
-/*Name*/"  Day ", //opt0
-		/*Min */1,
-		/*Max */31,
-		/*Data*/0, },
-
+static RTCStruct s_RTC_Data[] =
 {
-/*Name*/"Month", //opt1
-		/*Min */1,
-		/*Max */12,
-		/*Data*/0, },
+	  {
+		  /*Name*/ "  Day ", // opt0
+		  /*Min */ 1,
+		  /*Max */ 31,
+		  /*Data*/ 0,
+	  },
 
-{
-/*Name*/"Year", //opt2
-		/*Min */24,
-		/*Max */99,
-		/*Data*/0, },
+	  {
+		  /*Name*/ "Month", // opt1
+		  /*Min */ 1,
+		  /*Max */ 12,
+		  /*Data*/ 0,
+	  },
 
-{
-/*Name*/"Hour", //opt3
-		/*Min */0,
-		/*Max */23,
-		/*Data*/0, },
+	  {
+		  /*Name*/ "Year", // opt2
+		  /*Min */ 24,
+		  /*Max */ 99,
+		  /*Data*/ 0,
+	  },
 
-{
-/*Name*/"Minute", //opt4
+	  {
+		  /*Name*/ "Hour", // opt3
+		  /*Min */ 0,
+		  /*Max */ 23,
+		  /*Data*/ 0,
+	  },
 
-		/*Min */0,
-		/*Max */59,
-		/*Data*/0, },
+	  {
+		  /*Name*/ "Minute", // opt4
 
-{
-/*Name*/"Second", //opt5
-		/*Min */0,
-		/*Max */59,
-		/*Data*/0, }
+		  /*Min */ 0,
+		  /*Max */ 59,
+		  /*Data*/ 0,
+	  },
+
+	  {
+		  /*Name*/ "Second", // opt5
+		  /*Min */ 0,
+		  /*Max */ 59,
+		  /*Data*/ 0,
+	  }
 
 };
 
-unsigned char bcd_to_decimal(unsigned char d) {
+unsigned char bcd_to_decimal(unsigned char d)
+{
 	return ((d & 0x0F) + (((d & 0xF0) >> 4) * 10));
 }
 
-unsigned char decimal_to_bcd(unsigned char d) {
+unsigned char decimal_to_bcd(unsigned char d)
+{
 	return (((d / 10) << 4) & 0xF0) | ((d % 10) & 0x0F);
 }
 
-unsigned char DS3231_Read(unsigned char address) {
+unsigned char DS3231_Read(unsigned char address)
+{
 	return EXT_I2C_Read(DS3231_Read_addr, address);
 }
 
-void DS3231_Write(unsigned char address, unsigned char value) {
+void DS3231_Write(unsigned char address, unsigned char value)
+{
 	EXT_I2C_Write(DS3231_Write_addr, address, value);
 }
 
-void DS3231_init(void) {
+void DS3231_init(void)
+{
 	DS3231_Write(controlREG, 0x00);
 	DS3231_Write(statusREG, 0x08);
 }
 
 void getTime(unsigned char *p3, unsigned char *p2, unsigned char *p1, short *p0,
-		short hour_format) {
+			 short hour_format)
+{
 	unsigned char tmp = 0;
 
 	*p1 = DS3231_Read(secondREG);
@@ -86,16 +100,19 @@ void getTime(unsigned char *p3, unsigned char *p2, unsigned char *p1, short *p0,
 	*p2 = DS3231_Read(minuteREG);
 	*p2 = bcd_to_decimal(*p2);
 
-	switch (hour_format) {
-	case 1: {
+	switch (hour_format)
+	{
+	case 1:
+	{
 		tmp = DS3231_Read(hourREG);
 		tmp &= 0x20;
-		*p0 = (short) (tmp >> 5);
+		*p0 = (short)(tmp >> 5);
 		*p3 = (0x1F & DS3231_Read(hourREG));
 		*p3 = bcd_to_decimal(*p3);
 		break;
 	}
-	default: {
+	default:
+	{
 		*p3 = (0x3F & DS3231_Read(hourREG));
 		*p3 = bcd_to_decimal(*p3);
 		break;
@@ -104,7 +121,8 @@ void getTime(unsigned char *p3, unsigned char *p2, unsigned char *p1, short *p0,
 }
 
 void getDate(unsigned char *p4, unsigned char *p3, unsigned char *p2,
-		unsigned char *p1) {
+			 unsigned char *p1)
+{
 	*p1 = DS3231_Read(yearREG);
 	*p1 = bcd_to_decimal(*p1);
 	*p2 = (0x1F & DS3231_Read(monthREG));
@@ -116,18 +134,24 @@ void getDate(unsigned char *p4, unsigned char *p3, unsigned char *p2,
 }
 
 void RTC_setTime(unsigned char hSet, unsigned char mSet, unsigned char sSet,
-		short am_pm_state, short hour_format) {
+				 short am_pm_state, short hour_format)
+{
 	unsigned char tmp = 0;
 	DS3231_Write(secondREG, (decimal_to_bcd(sSet)));
 	DS3231_Write(minuteREG, (decimal_to_bcd(mSet)));
-	switch (hour_format) {
-	case 1: {
-		switch (am_pm_state) {
-		case 1: {
+	switch (hour_format)
+	{
+	case 1:
+	{
+		switch (am_pm_state)
+		{
+		case 1:
+		{
 			tmp = 0x60;
 			break;
 		}
-		default: {
+		default:
+		{
 			tmp = 0x40;
 			break;
 		}
@@ -136,7 +160,8 @@ void RTC_setTime(unsigned char hSet, unsigned char mSet, unsigned char sSet,
 		break;
 	}
 
-	default: {
+	default:
+	{
 		DS3231_Write(hourREG, (0x3F & (decimal_to_bcd(hSet))));
 		break;
 	}
@@ -144,18 +169,21 @@ void RTC_setTime(unsigned char hSet, unsigned char mSet, unsigned char sSet,
 }
 
 void RTC_setDate(unsigned char daySet, unsigned char dateSet,
-		unsigned char monthSet, unsigned char yearSet) {
+				 unsigned char monthSet, unsigned char yearSet)
+{
 	DS3231_Write(dayREG, (decimal_to_bcd(daySet)));
 	DS3231_Write(dateREG, (decimal_to_bcd(dateSet)));
 	DS3231_Write(monthREG, (decimal_to_bcd(monthSet)));
 	DS3231_Write(yearREG, (decimal_to_bcd(yearSet)));
 }
 
-void display_RealTime(int x, int y) {
-	//fetch time from RTC
+void display_RealTime(int x, int y)
+{
+	// fetch time from RTC
 	unsigned char old_rtc_hour = rtc_hour;
 	getTime(&rtc_hour, &rtc_minute, &rtc_second, &rtc_ampm, _24_hour_format);
-	if (rtc_hour < old_rtc_hour) {
+	if (rtc_hour < old_rtc_hour)
+	{
 		getDate(&rtc_dow, &rtc_date, &rtc_month, &rtc_year);
 		display_Real_Date(0, 240);
 		Init_Log_File();
@@ -163,24 +191,28 @@ void display_RealTime(int x, int y) {
 	show_Real_Time(x, y, rtc_hour, rtc_minute, rtc_second, 0);
 }
 
-void load_RealTime(void) {
+void load_RealTime(void)
+{
 	getTime(&rtc_hour, &rtc_minute, &rtc_second, &rtc_ampm, _24_hour_format);
 	s_RTC_Data[3].data = rtc_hour;
 	s_RTC_Data[4].data = rtc_minute;
 	s_RTC_Data[5].data = rtc_second;
 }
 
-void display_RTC_TimeEdit(int x, int y) {
+void display_RTC_TimeEdit(int x, int y)
+{
 	show_Real_Time(x, y, s_RTC_Data[3].data, s_RTC_Data[4].data,
-			s_RTC_Data[5].data, 0);
+				   s_RTC_Data[5].data, 0);
 }
 
-void set_RTC_to_TimeEdit(void) {
+void set_RTC_to_TimeEdit(void)
+{
 	RTC_setTime(s_RTC_Data[3].data, s_RTC_Data[4].data, s_RTC_Data[5].data, 0,
-			0);
+				0);
 }
 
-void load_RealDate(void) {
+void load_RealDate(void)
+{
 	getDate(&rtc_dow, &rtc_date, &rtc_month, &rtc_year);
 	if (rtc_date > 0)
 		s_RTC_Data[0].data = rtc_date;
@@ -198,34 +230,45 @@ void load_RealDate(void) {
 		s_RTC_Data[2].data = 1;
 }
 
-void display_RTC_DateEdit(int x, int y) {
+void display_RTC_DateEdit(int x, int y)
+{
 	show_Real_Date(x, y, s_RTC_Data[0].data, s_RTC_Data[1].data,
-			s_RTC_Data[2].data);
+				   s_RTC_Data[2].data);
 }
 
-void set_RTC_to_DateEdit(void) {
+void set_RTC_to_DateEdit(void)
+{
 	RTC_setDate(0, s_RTC_Data[0].data, s_RTC_Data[1].data, s_RTC_Data[2].data);
 }
 
-void display_Real_Date(int x, int y) {
+void display_Real_Date(int x, int y)
+{
 	getDate(&rtc_dow, &rtc_date, &rtc_month, &rtc_year);
 	show_Real_Date(x, y, rtc_date, rtc_month, rtc_year);
 }
 
-void make_Real_Time(char *log_rtc_time_string) {
+void make_Real_Time(char *log_rtc_time_string)
+{
 
 	getTime(&rtc_hour, &rtc_minute, &rtc_second, &rtc_ampm, _24_hour_format);
 	sprintf(log_rtc_time_string, "%02i%02i%02i", rtc_hour, rtc_minute,
 			rtc_second);
 }
 
-void make_Real_Date(char *log_rtc_date_string) {
+void make_Real_Date(char *log_rtc_date_string)
+{
 
 	getDate(&rtc_dow, &rtc_date, &rtc_month, &rtc_year);
 	sprintf(log_rtc_date_string, "20%02i%02i%02i", rtc_year,
 			rtc_month, rtc_date);
 }
 
-void RTC_SetValue(int Idx, char newValue) {
+void RTC_SetValue(int Idx, char newValue)
+{
 	s_RTC_Data[Idx].data = newValue;
+}
+
+RTCStruct *get_rtc_data(int id)
+{
+	return s_RTC_Data + id;
 }

@@ -10,6 +10,7 @@
 
 #include "arm_math.h"
 
+#define RTC_STRING_SIZE 13
 #define FILENAME_STRING_SIZE 24
 
 void Write_Log_Data(const char *file_data);

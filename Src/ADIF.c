@@ -55,7 +55,7 @@ void write_ADIF_Log(void)
 		make_Real_Date(date_string);
 
 		const char *freq = sBand_Data[BandIndex].display;
-	
+
 		int offset = sprintf(log_line, "<call:%1u>%s ", num_chars(Target_Call), trim_front(Target_Call));
 		int target_locator_len = num_chars(Target_Locator);
 		if (target_locator_len > 0)
