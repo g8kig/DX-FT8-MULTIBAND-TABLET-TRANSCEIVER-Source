@@ -158,14 +158,12 @@ void show_short(uint16_t x, uint16_t y, uint8_t variable)
 	BSP_LCD_DisplayStringAt(x, y, (const uint8_t *)string, CENTER_MODE);
 }
 
-void show_UTC_time(uint16_t x, uint16_t y, int utc_hours, int utc_minutes,
-				   int utc_seconds, int color)
+void show_Real_Time(uint16_t x, uint16_t y, int hours, int minutes, int seconds, int color)
 {
-	sprintf(rtc_time_string, "%02i:%02i:%02i", utc_hours, utc_minutes,
-			utc_seconds);
+	sprintf(rtc_time_string, "%02i:%02i:%02i", hours, minutes, seconds);
 	BSP_LCD_SetFont(&Font16);
 
-	if (color == 0)
+	if (color)
 		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 	else
 		BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);

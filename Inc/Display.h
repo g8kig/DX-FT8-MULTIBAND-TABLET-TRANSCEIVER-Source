@@ -30,8 +30,7 @@ void show_short(uint16_t x, uint16_t y, uint8_t variable);
 
 void show_wide(uint16_t x, uint16_t y, int variable);
 
-void show_UTC_time(uint16_t x, uint16_t y, int utc_hours, int utc_minutes,
-		int utc_seconds, int color);
+void show_Real_Time(uint16_t x, uint16_t y, int hours, int minutes, int seconds, int color);
 
 void show_Real_Date(uint16_t x, uint16_t y, int date, int month, int year);
 

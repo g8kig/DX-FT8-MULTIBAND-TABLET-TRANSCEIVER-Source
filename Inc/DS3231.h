@@ -52,13 +52,6 @@ extern RTCStruct s_RTC_Data[];
 
 extern int RTC_Set_Flag;
 
-#define RTC_STRING_SIZE 13
-#define FILENAME_STRING_SIZE 24
-
-extern char log_rtc_time_string[RTC_STRING_SIZE];
-extern char log_rtc_date_string[RTC_STRING_SIZE];
-extern char file_name_string[FILENAME_STRING_SIZE];
-
 void DS3231_Write(unsigned char address, unsigned char value);
 void DS3231_init(void);
 void getTime(unsigned char *hour, unsigned char *minute, unsigned char *second,
@@ -74,16 +67,15 @@ void RTC_setDate(unsigned char daySet, unsigned char dateSet,
 void display_RealTime(int x, int y);
 void display_Real_Date(int x, int y);
 
-void make_Real_Time(void);
-void make_Real_Date(void);
-void make_File_Name(void);
+void make_Real_Time(char *time_string);
+void make_Real_Date(char *date_string);
 
 void load_RealTime(void);
+void load_RealDate(void);
+
 void display_RTC_TimeEdit(int x, int y);
 void display_RTC_DateEdit(int x, int y);
 void set_RTC_to_TimeEdit(void);
 void set_RTC_to_DateEdit(void);
-
-void load_RealDate(void);
 
 #endif /* DS3231_H_ */

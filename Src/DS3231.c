@@ -12,14 +12,9 @@
 #include "options.h"
 #include "log_file.h"
 
-char log_rtc_time_string[RTC_STRING_SIZE];
-char log_rtc_date_string[RTC_STRING_SIZE];
-
 static unsigned char rtc_hour, rtc_minute, rtc_second, rtc_dow, rtc_date, rtc_month,
 		rtc_year;
 static short rtc_ampm;
-
-char file_name_string[FILENAME_STRING_SIZE];
 
 RTCStruct s_RTC_Data[] = { {
 /*Name*/"  Day ", //opt0
@@ -165,7 +160,7 @@ void display_RealTime(int x, int y) {
 		display_Real_Date(0, 240);
 		Init_Log_File();
 	}
-	show_UTC_time(x, y, rtc_hour, rtc_minute, rtc_second, 0);
+	show_Real_Time(x, y, rtc_hour, rtc_minute, rtc_second, 0);
 }
 
 void load_RealTime(void) {
@@ -176,7 +171,7 @@ void load_RealTime(void) {
 }
 
 void display_RTC_TimeEdit(int x, int y) {
-	show_UTC_time(x, y, s_RTC_Data[3].data, s_RTC_Data[4].data,
+	show_Real_Time(x, y, s_RTC_Data[3].data, s_RTC_Data[4].data,
 			s_RTC_Data[5].data, 0);
 }
 
@@ -217,24 +212,18 @@ void display_Real_Date(int x, int y) {
 	show_Real_Date(x, y, rtc_date, rtc_month, rtc_year);
 }
 
-void make_Real_Time(void) {
+void make_Real_Time(char *log_rtc_time_string) {
 
 	getTime(&rtc_hour, &rtc_minute, &rtc_second, &rtc_ampm, _24_hour_format);
 	sprintf(log_rtc_time_string, "%02i%02i%02i", rtc_hour, rtc_minute,
 			rtc_second);
 }
 
-void make_Real_Date(void) {
+void make_Real_Date(char *log_rtc_date_string) {
 
 	getDate(&rtc_dow, &rtc_date, &rtc_month, &rtc_year);
 	sprintf(log_rtc_date_string, "20%02i%02i%02i", rtc_year,
 			rtc_month, rtc_date);
-}
-
-void make_File_Name(void) {
-
-	make_Real_Date();
-	sprintf(file_name_string, "%s.adi", log_rtc_date_string);
 }
 
 void RTC_SetValue(int Idx, char newValue) {

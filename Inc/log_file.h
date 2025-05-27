@@ -10,9 +10,11 @@
 
 #include "arm_math.h"
 
-void Write_Log_Data(const char *ch);
+#define FILENAME_STRING_SIZE 24
+
+void Write_Log_Data(const char *file_data);
 void Close_Log_File(void);
-void Open_Log_File(void);
+void Open_Log_File();
 void Init_Log_File(void);
 
 #endif /* LOG_FILE_H_ */
