@@ -9,3 +9,4 @@ Debug/*
 .settings/language.settings.xml
 Katy.*
 
+.DS_Store
