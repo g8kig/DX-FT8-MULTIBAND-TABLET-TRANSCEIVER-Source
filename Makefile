@@ -1,18 +1,19 @@
 # STM32 toolchain path
 TOOLCHAIN_PATH = $(HOME)/.platformio/packages/toolchain-gccarmnoneeabi/bin/
+
 CC = $(TOOLCHAIN_PATH)/arm-none-eabi-gcc
 SIZE = $(TOOLCHAIN_PATH)/arm-none-eabi-size
 OBJDUMP = $(TOOLCHAIN_PATH)/arm-none-eabi-objdump
 OBJCOPY = $(TOOLCHAIN_PATH)/arm-none-eabi-objcopy
 
 CFLAGS = -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F746xx -DUSE_STM32746G_DISCO -DUSE_IOEXPANDER \
-         -Os -ffunction-sections --specs=nano.specs 
-         -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb 
+         -Os -ffunction-sections --specs=nano.specs \
+         -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb \
          -Wall -Wextra
 
 EXTRA_INCLUDES = \
-    -IDrivers/BSP/STM32746G-Discovery \
     -IDrivers/BSP/Common \
+    -IDrivers/BSP/STM32746G_DISCOVERY \
     -IDrivers/BSP/exc7200 \
     -IDrivers/BSP/ft5336 \
     -IDrivers/BSP/mfxstm32l152 \
@@ -174,7 +175,7 @@ TARGET = Katy.elf
 
 .PHONY: all clean
 
-all: $(TARGET) Katy.hex Katy.list size
+all: $(TARGET) Katy.hex Katy.list
 
 %.o: %.c
 	 $(CC) $(CFLAGS) $(EXTRA_INCLUDES) -c $< -o $@
@@ -190,8 +191,6 @@ Katy.hex: $(TARGET)
 
 Katy.list: $(TARGET)
 	$(OBJDUMP) -h -S $(TARGET) > $@
-
-size: $(TARGET)
 	$(SIZE) $(TARGET)
 
 clean:
