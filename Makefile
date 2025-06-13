@@ -1,5 +1,5 @@
 # STM32 toolchain path
-TOOLCHAIN_PATH = /opt/st/stm32cubeide_1.16.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.linux64_1.1.0.202411081344/tools/bin
+TOOLCHAIN_PATH = $(HOME)/.platformio/packages/toolchain-gccarmnoneeabi/bin/
 CC = $(TOOLCHAIN_PATH)/arm-none-eabi-gcc
 SIZE = $(TOOLCHAIN_PATH)/arm-none-eabi-size
 OBJDUMP = $(TOOLCHAIN_PATH)/arm-none-eabi-objdump
@@ -11,11 +11,27 @@ CFLAGS = -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F746xx -DUSE_STM
          -IUtilities/Fonts -Os -ffunction-sections --specs=nano.specs -mfpu=fpv5-sp-d16 \
          -mfloat-abi=hard -mthumb -Wall -Wextra
 
-ASFLAGS = -mcpu=cortex-m7 -g3 -c -Wall -Wextra -x assembler-with-cpp --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb
+EXTRA_INCLUDES = \
+    -IDrivers/BSP/STM32746G-Discovery \
+    -IDrivers/BSP/STM32746G_DISCOVERY \
+    -IDrivers/BSP/Common \
+    -IDrivers/BSP/exc7200 \
+    -IDrivers/BSP/ft5336 \
+    -IDrivers/BSP/mfxstm32l152 \
+    -IDrivers/BSP/ov9655 \
+    -IDrivers/BSP/s5k5cag \
+    -IDrivers/BSP/st7735 \
+    -IDrivers/BSP/stmpe811 \
+    -IDrivers/BSP/ts3510 \
+    -IDrivers/BSP/wm8994 \
+    -IDrivers/BSP/rk043fn48h \
+	-IFT8_library \
+	-IMiddlewares/src 
+
+ASMFLAGS = -mcpu=cortex-m7 -g3 -c -Wall -Wextra -x assembler-with-cpp --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb
 
 LDFLAGS = -mcpu=cortex-m7 -TSTM32F746NGHx_FLASH.ld --specs=nosys.specs -Wl,-Map=Katy.map -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 
-# List all source files (add/remove as needed)
 ASM_SRCS = Drivers/CMSIS/Device/ST/STM32F7xx/Source/Templates/gcc/startup_stm32f746xx.s DSP_CMSIS/arm_bitreversal2.s
 
 C_SRCS = \
@@ -144,7 +160,7 @@ Src/SiLabs.c \
 Src/Sine_table.c \
 Src/stm32f7xx_it.c \
 Src/traffic_manager.c \
-Src/ini.c
+Src/Ini.c
 
 # Object files
 ASM_OBJS = $(ASM_SRCS:.s=.o)
@@ -157,23 +173,26 @@ TARGET = Katy.elf
 
 all: $(TARGET) Katy.hex Katy.list
 
-%.o: %.s
-    $(CC) $(ASFLAGS) $< -o $@
+#$(C_OBJS) : $(C_SRCS)
+#    $(CC) $(CFLAGS) -c $(C_SRCS)
 
 %.o: %.c
-    $(CC) $(CFLAGS) -c $< -o $@
+	 $(CC) $(CFLAGS) $(EXTRA_INCLUDES) -c $< -o $@
+
+%.o: %.s
+	$(CC) $(ASMFLAGS) $< -o $@
 
 $(TARGET): $(OBJS)
-    $(CC) -o $@ $^ $(LDFLAGS)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 Katy.hex: $(TARGET)
-    $(OBJCOPY) -O ihex $(TARGET) $@
+	$(OBJCOPY) -O ihex $(TARGET) $@
 
 Katy.list: $(TARGET)
-    $(OBJDUMP) -h -S $(TARGET) > $@
+	$(OBJDUMP) -h -S $(TARGET) > $@
 
 size: $(TARGET)
-    $(SIZE) $(TARGET)
+	$(SIZE) $(TARGET)
 
 clean:
-    rm -f $(OBJS) $(TARGET) Katy.hex Katy.list Katy.map
+	rm -f $(OBJS) $(TARGET) Katy.hex Katy.list
