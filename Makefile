@@ -6,14 +6,12 @@ OBJDUMP = $(TOOLCHAIN_PATH)/arm-none-eabi-objdump
 OBJCOPY = $(TOOLCHAIN_PATH)/arm-none-eabi-objcopy
 
 CFLAGS = -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F746xx -DUSE_STM32746G_DISCO -DUSE_IOEXPANDER \
-         -IInc -IDrivers/CMSIS/Include -IDrivers/CMSIS/Device/ST/STM32F7xx/Include \
-         -IDrivers/STM32F7xx_HAL_Driver/Inc -IDrivers/BSP/STM32746G-Discovery -IDrivers/BSP/Common \
-         -IUtilities/Fonts -Os -ffunction-sections --specs=nano.specs -mfpu=fpv5-sp-d16 \
-         -mfloat-abi=hard -mthumb -Wall -Wextra
+         -Os -ffunction-sections --specs=nano.specs 
+         -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb 
+         -Wall -Wextra
 
 EXTRA_INCLUDES = \
     -IDrivers/BSP/STM32746G-Discovery \
-    -IDrivers/BSP/STM32746G_DISCOVERY \
     -IDrivers/BSP/Common \
     -IDrivers/BSP/exc7200 \
     -IDrivers/BSP/ft5336 \
@@ -26,7 +24,12 @@ EXTRA_INCLUDES = \
     -IDrivers/BSP/wm8994 \
     -IDrivers/BSP/rk043fn48h \
 	-IFT8_library \
-	-IMiddlewares/src 
+	-IMiddlewares/src \
+    -IInc \
+    -IDrivers/CMSIS/Include \
+    -IDrivers/CMSIS/Device/ST/STM32F7xx/Include \
+    -IDrivers/STM32F7xx_HAL_Driver/Inc \
+    -IUtilities/Fonts
 
 ASMFLAGS = -mcpu=cortex-m7 -g3 -c -Wall -Wextra -x assembler-with-cpp --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb
 
@@ -171,10 +174,7 @@ TARGET = Katy.elf
 
 .PHONY: all clean
 
-all: $(TARGET) Katy.hex Katy.list
-
-#$(C_OBJS) : $(C_SRCS)
-#    $(CC) $(CFLAGS) -c $(C_SRCS)
+all: $(TARGET) Katy.hex Katy.list size
 
 %.o: %.c
 	 $(CC) $(CFLAGS) $(EXTRA_INCLUDES) -c $< -o $@
