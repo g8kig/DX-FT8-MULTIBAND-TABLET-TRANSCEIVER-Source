@@ -30,11 +30,11 @@
  */
 
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdbool.h>
 
 #include "stm32746g_discovery.h"
-#include <stdint.h>
-#include <stdlib.h>
+
 #include "main.h"
 #include "SiLabs.h"
 

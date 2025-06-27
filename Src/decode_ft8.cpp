@@ -10,19 +10,24 @@
 #include <stdio.h>
 #include <math.h>
 #include <ctype.h>
-#include <Display.h>
-#include <gen_ft8.h>
 
+#include "stm32746g_discovery_lcd.h"
+
+#include "Display.h"
+#include "gen_ft8.h"
+
+extern "C"
+{
 #include "unpack.h"
 #include "ldpc.h"
 #include "decode.h"
-#include "constants.h"
 #include "encode.h"
+#include "constants.h"
+}
+
 #include "button.h"
 #include "main.h"
-
 #include "Process_DSP.h"
-#include "stm32746g_discovery_lcd.h"
 #include "log_file.h"
 #include "decode_ft8.h"
 #include "traffic_manager.h"
@@ -34,19 +39,19 @@ const int kMax_candidates = 20;
 const int kMax_decoded_messages = 20;
 const unsigned int kMax_message_length = 25;
 const int kMin_score = 40; // Minimum sync score threshold for candidates
+const int message_limit = 10;
+const int log_size = 50;
 
 static int validate_locator(const char locator[]);
 static int strindex(const char s[], const char t[]);
 
 extern char current_QSO_receive_message[];
 
-static display_message display[10];
-static Decode new_decoded[25];
-static Calling_Station Answer_CQ[50];
-static int log_size = 50;
+static display_message display[message_limit];
+static Decode new_decoded[kMax_decoded_messages];
+static Calling_Station Answer_CQ[log_size];
 
 static int num_calls; // number of unique calling stations
-static int message_limit = 10;
 
 int Auto_QSO_State;
 int Target_RSL;
@@ -93,18 +98,18 @@ int ft8_decode(void)
 		if (chksum != chksum2)
 			continue;
 
-		char message[14 + 14 + 7 + 1];
+		char message[DECODE_CALLSIGN_SIZE + DECODE_CALLSIGN_SIZE + DECODE_LOCATOR_SIZE + 1];
 
-		char call_to[14];
-		char call_from[14];
-		char locator[7];
+		char call_to[DECODE_CALLSIGN_SIZE];
+		char call_from[DECODE_CALLSIGN_SIZE];
+		char locator[DECODE_LOCATOR_SIZE];
 		int rc = unpack77_fields(a91, call_to, call_from, locator);
 		if (rc < 0)
 			continue;
 
 		sprintf(message, "%s %s %s ", call_to, call_from, locator);
 
-		_Bool found = false;
+		bool found = false;
 		for (int i = 0; i < num_decoded; ++i)
 		{
 			if (0 == strcmp(decoded[i], message))
@@ -263,7 +268,7 @@ void clear_log_stored_data(void)
 		Answer_CQ[i].RSL = 0;
 		Answer_CQ[i].RR73 = 0;
 		Answer_CQ[i].received_RSL = 99;
-		Answer_CQ[i].sequence = 0;
+		Answer_CQ[i].sequence = (Sequence)0;
 	}
 }
 
@@ -282,7 +287,7 @@ void clear_decoded_messages(void)
 		new_decoded[i].received_snr = 99;
 		new_decoded[i].slot = 0;
 		new_decoded[i].RR73 = 0;
-		new_decoded[i].sequence = 0;
+		new_decoded[i].sequence = (Sequence)0;
 	}
 }
 
@@ -293,7 +298,7 @@ int Check_Calling_Stations(int num_decoded)
 	{
 		// check to see if being called
 		int old_call;
-		int old_call_address;
+		int old_call_address = 0;
 
 		if (strindex(new_decoded[i].call_to, Station_Call) >= 0)
 		{
@@ -374,7 +379,6 @@ int Check_Calling_Stations(int num_decoded)
 					Answer_CQ[old_call_address].received_RSL = new_decoded[i].received_snr;
 
 				Station_RSL = Answer_CQ[old_call_address].received_RSL;
-
 
 				if (!Answer_CQ[old_call_address].RR73)
 				{

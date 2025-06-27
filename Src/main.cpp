@@ -26,13 +26,20 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+#include "stm32f7xx_hal.h"
 #include "stm32f7xx_hal_rcc.h"
+#include "stm32746g_discovery.h"
 #include "stm32746g_discovery_ts.h"
 #include "stm32746g_discovery_lcd.h"
 #include "stm32f7xx_hal_tim.h"
 #include "arm_math.h"
 
+extern "C"
+{
+#include "constants.h"
+}
+
+#include "main.h"
 #include "SDR_Audio.h"
 #include "Display.h"
 #include "Process_DSP.h"
@@ -64,7 +71,7 @@ static int master_decoded = 0;
 static void SystemClock_Config(void);
 static void Error_Handler(void);
 static void CPU_CACHE_Enable(void);
-static void HID_InitApplication(void);
+static void InitialiseDisplay(void);
 
 static void update_synchronization(void)
 {
@@ -104,11 +111,9 @@ int main(void)
 	Check_Board_Version();
 	DeInit_BoardVersionInput();
 
-	HID_InitApplication(); // really sets up LCD Display, leftover from example
+	InitialiseDisplay();
 	HAL_Delay(10);
 	BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
-
-	initalize_constants();
 
 	init_DSP();
 
@@ -134,7 +139,7 @@ int main(void)
 	HAL_Delay(10);
 	receive_sequence();
 	HAL_Delay(10);
-	Set_Headphone_Gain(30);
+	Set_Headphone_Gain(94);
 	Init_Log_File();
 	FT8_Sync();
 	HAL_Delay(10);
@@ -155,7 +160,6 @@ int main(void)
 					{
 						if ((ft8_xmit_counter < 79) && (Xmit_DSP_counter % 4 == 0))
 						{
-							ft8_shift = ft8_hz * (double)tones[ft8_xmit_counter];
 							set_FT8_Tone(tones[ft8_xmit_counter]);
 							ft8_xmit_counter++;
 						}
@@ -171,10 +175,6 @@ int main(void)
 							if (!Beacon_On)
 								clear_queued_message();
 						}
-					}
-					else
-					{
-						ft8_shift = 0;
 					}
 				}
 				else
@@ -225,11 +225,11 @@ int main(void)
 }
 
 /**
- * @brief  HID application Init
+ * @brief  Initialise Display
  * @param  None
  * @retval None
  */
-static void HID_InitApplication(void)
+static void InitialiseDisplay(void)
 {
 	/* Configure Key button */
 	BSP_PB_Init(BUTTON_TAMPER, BUTTON_MODE_GPIO);

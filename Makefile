@@ -1,12 +1,24 @@
+# Makefile for the DX FT8 Multiband Tablet Transceiver project
+# Requires GNU Make and the ARM GCC toolchain from the PlatformIO toolset to be installed
+# Optionally also requires the ST-Link tools for flashing the STM32F7 microcontroller
+# Install platformio-cli and then run 'pio pkg install --tool toolchain-gccarmnoneeabi@@~1.100301.0' to install the toolchain
+# To install GNU Make on Windows see https://stackoverflow.com/questions/32127524/how-to-install-and-use-make-in-windows
+
 # STM32 toolchain path
 TOOLCHAIN_PATH = $(HOME)/.platformio/packages/toolchain-gccarmnoneeabi/bin/
 
 CC = $(TOOLCHAIN_PATH)/arm-none-eabi-gcc
+C++ = $(TOOLCHAIN_PATH)/arm-none-eabi-g++
 SIZE = $(TOOLCHAIN_PATH)/arm-none-eabi-size
 OBJDUMP = $(TOOLCHAIN_PATH)/arm-none-eabi-objdump
 OBJCOPY = $(TOOLCHAIN_PATH)/arm-none-eabi-objcopy
 
 CFLAGS = -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F746xx -DUSE_STM32746G_DISCO -DUSE_IOEXPANDER \
+         -Os -ffunction-sections --specs=nano.specs \
+         -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb \
+         -Wall -Wextra
+
+CPPFLAGS = -mcpu=cortex-m7 -std=gnu++11 -g3 -DUSE_HAL_DRIVER -DSTM32F746xx -DUSE_STM32746G_DISCO -DUSE_IOEXPANDER \
          -Os -ffunction-sections --specs=nano.specs \
          -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb \
          -Wall -Wextra
@@ -147,38 +159,44 @@ Middlewares/src/sdram_diskio.c \
 Middlewares/src/sd_diskio.c \
 Middlewares/src/unicode.c \
 Middlewares/src/option/syscall.c \
-Src/ADIF.c \
-Src/button.c \
-Src/Codec_Gains.c \
-Src/decode_ft8.c \
-Src/Display.c \
-Src/DS3231.c \
-Src/FIR_Coefficients.c \
-Src/gen_ft8.c \
-Src/log_file.c \
-Src/main.c \
-Src/options.c \
-Src/Process_DSP.c \
-Src/SDR_Audio.c \
-Src/SiLabs.c \
-Src/Sine_table.c \
-Src/stm32f7xx_it.c \
-Src/traffic_manager.c \
-Src/Ini.c
+Src/stm32f7xx_it.c
+
+CPP_SRCS = \
+Src/ADIF.cpp \
+Src/button.cpp \
+Src/Codec_Gains.cpp \
+Src/decode_ft8.cpp \
+Src/Display.cpp \
+Src/DS3231.cpp \
+Src/FIR_Coefficients.cpp \
+Src/gen_ft8.cpp \
+Src/log_file.cpp \
+Src/main.cpp \
+Src/options.cpp \
+Src/Process_DSP.cpp \
+Src/SDR_Audio.cpp \
+Src/SiLabs.cpp \
+Src/Sine_table.cpp \
+Src/traffic_manager.cpp \
+Src/Ini.cpp
 
 # Object files
 ASM_OBJS = $(ASM_SRCS:.s=.o)
 C_OBJS = $(C_SRCS:.c=.o)
-OBJS = $(ASM_OBJS) $(C_OBJS)
+CPP_OBJS = $(CPP_SRCS:.cpp=.o)
+OBJS = $(ASM_OBJS) $(C_OBJS) $(CPP_OBJS)
 
 TARGET = Katy.elf
 
-.PHONY: all clean
+.PHONY: all clean flash
 
 all: $(TARGET) Katy.hex Katy.list
 
 %.o: %.c
 	 $(CC) $(CFLAGS) $(EXTRA_INCLUDES) -c $< -o $@
+
+%.o: %.cpp
+	 $(C++) $(CPPFLAGS) $(EXTRA_INCLUDES) -c $< -o $@
 
 %.o: %.s
 	$(CC) $(ASMFLAGS) $< -o $@
@@ -193,5 +211,12 @@ Katy.list: $(TARGET)
 	$(OBJDUMP) -h -S $(TARGET) > $@
 	$(SIZE) $(TARGET)
 
+flash: $(TARGET)
+	$(OBJCOPY) -O binary $(TARGET) Katy.bin
+	st-info --probe
+	st-flash --reset write Katy.bin 0x08000000
+	rm -f Katy.bin
+
 clean:
 	rm -f $(OBJS) $(TARGET) Katy.hex Katy.list
+

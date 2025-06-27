@@ -9,26 +9,17 @@
 #define CONSTANTS_H_
 
 #include <stdint.h>
+#include <stdbool.h>
 
-#define true 1
-#define false 0
-
-// Define FT8 symbol counts
-extern int ND;
-extern int NS;
-
-extern int NN;
-// Define the LDPC sizes
-extern int N;
-extern int K;
-
-extern int M;
-
-extern int K_BYTES;
-
-// Define CRC parameters
-extern uint16_t CRC_POLYNOMIAL; // CRC-14 polynomial without the leading (MSB) 1
-extern int CRC_WIDTH;
+extern const int ND;                  // Data symbols
+extern const int NS;                  // Sync symbols (3 @ Costas 7x7)
+extern const int NN;                  // Total channel symbols (79)
+extern const int N;                   // Number of bits in the encoded message
+extern const int K;                   // Number of payload bits
+extern const int M;                   // Number of checksum bits
+extern const int K_BYTES;             // Number of whole bytes needed to store K bits
+extern const uint16_t CRC_POLYNOMIAL; // CRC-14 polynomial without the leading (MSB) 1
+extern const int CRC_WIDTH;           // CRC width in bits
 
 extern uint8_t tones[79];
 
@@ -39,13 +30,8 @@ extern const uint8_t kCostas_map[7];
 extern const uint8_t kGray_map[8];
 
 // Parity generator matrix for (174,91) LDPC code, stored in bitpacked format (MSB first)
-//extern const uint8_t kGenerator[M][K_BYTES];
-extern uint8_t kGenerator[83][12];
-
-// Column order (permutation) in which the bits in codeword are stored
-// (Not really used in FT8 v2 - instead the Nm, Mn and generator matrices are already permuted)
-//extern const uint8_t kColumn_order[N];
-extern uint8_t kColumn_order[174];
+// extern const uint8_t kGenerator[M][K_BYTES];
+extern const uint8_t kGenerator[83][12];
 
 // this is the LDPC(174,91) parity check matrix.
 // 83 rows.
@@ -53,8 +39,7 @@ extern uint8_t kColumn_order[174];
 // each number is an index into the codeword (1-origin).
 // the codeword bits mentioned in each row must xor to zero.
 // From WSJT-X's ldpc_174_91_c_reordered_parity.f90.
-//extern const uint8_t kNm[M][7];
-extern uint8_t kNm[83][7];
+extern const uint8_t kNm[83][7];
 
 // Mn from WSJT-X's bpdecode174.f90.
 // each row corresponds to a codeword bit.
@@ -62,13 +47,9 @@ extern uint8_t kNm[83][7];
 // checks (rows in Nm) refer to the codeword bit.
 // 1-origin.
 
-//extern const uint8_t kMn[N][3];
-extern uint8_t kMn[174][3];
+extern const uint8_t kMn[174][3];
 
 // Number of rows (columns in C/C++) in the array Nm.
-//extern const uint8_t kNrw[M];
-extern uint8_t kNrw[83];
-
-void initalize_constants(void);
+extern const uint8_t kNrw[83];
 
 #endif /* CONSTANTS_H_ */

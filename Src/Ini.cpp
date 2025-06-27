@@ -4,12 +4,6 @@
 
 #include "ini.h"
 
-#ifndef bool
-typedef unsigned char bool;
-#define true 1
-#define false 0
-#endif
-
 #define min(a, b) ((a) < (b)) ? (a) : (b)
 
 // Basic function to check if a character is whitespace (space or tab)

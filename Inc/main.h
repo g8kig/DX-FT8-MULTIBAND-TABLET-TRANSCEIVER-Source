@@ -4,10 +4,7 @@
 #define __MAIN_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stdio.h"
-
-#include "stm32746g_discovery.h"
-#include "stm32f7xx_hal.h"
+#include <stdio.h>
 
 #define NoOp  __NOP()
 

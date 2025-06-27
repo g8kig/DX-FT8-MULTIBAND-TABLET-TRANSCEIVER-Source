@@ -2411,7 +2411,7 @@ __STATIC_INLINE uint32_t SysTick_Config(uint32_t ticks)
 
   SysTick->LOAD  = (uint32_t)(ticks - 1UL);                         /* set reload register */
  // NVIC_SetPriority (SysTick_IRQn, (1UL << __NVIC_PRIO_BITS) - 1UL); /* set Priority for Systick Interrupt */
-  NVIC_SetPriority (-1, (1UL << 4) - 1UL);
+  NVIC_SetPriority ((IRQn_Type)-1, (1UL << 4) - 1UL);
   SysTick->VAL   = 0UL;                                             /* Load the SysTick Counter Value */
   SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
                    SysTick_CTRL_TICKINT_Msk   |

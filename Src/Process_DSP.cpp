@@ -16,31 +16,6 @@
 #include "decode.h"
 #include "FIR_Coefficients.h"
 
-float ft_blackman_i(int i, int N);
-
-double NCO_Frequency;
-
-int ft8_flag, FT_8_counter, ft8_marker;
-q15_t window_dsp_buffer[FFT_SIZE];
-
-uint8_t FFT_Buffer[ft8_buffer_size];
-
-q15_t extract_signal[input_gulp_size * 3]; // was float
-q15_t dsp_output[FFT_SIZE * 2];
-
-uint8_t export_fft_power[ft8_msg_samples * ft8_buffer_size * 4];
-
-int offset_step;
-
-q15_t FFT_Scale[FFT_SIZE * 2];
-q15_t FFT_Magnitude[FFT_SIZE];
-int32_t FFT_Mag_10[FFT_SIZE / 2];
-
-float mag_db[FFT_SIZE / 2 + 1];
-float window[FFT_SIZE];
-
-double NCO_Frequency;
-
 q15_t FIR_State_I[NUM_FIR_COEF + (BUFFERSIZE / 4) - 1];
 q15_t FIR_State_Q[NUM_FIR_COEF + (BUFFERSIZE / 4) - 1];
 
@@ -49,6 +24,22 @@ arm_fir_instance_q15 S_FIR_I_32K = {NUM_FIR_COEF, &FIR_State_I[0],
 
 arm_fir_instance_q15 S_FIR_Q_32K = {NUM_FIR_COEF, &FIR_State_Q[0],
 									&coeff_fir_Q_32K[0]};
+
+double NCO_Frequency;
+int ft8_flag, FT_8_counter, ft8_marker;
+uint8_t FFT_Buffer[ft8_buffer_size];
+q15_t extract_signal[input_gulp_size * 3]; // was floa
+uint8_t export_fft_power[ft8_msg_samples * ft8_buffer_size * 4];
+
+static int offset_step;
+static q15_t dsp_output[FFT_SIZE * 2];
+static q15_t window_dsp_buffer[FFT_SIZE];
+static q15_t FFT_Scale[FFT_SIZE * 2];
+static q15_t FFT_Magnitude[FFT_SIZE];
+static int32_t FFT_Mag_10[FFT_SIZE / 2];
+
+static float mag_db[FFT_SIZE / 2 + 1];
+static float window[FFT_SIZE];
 
 void Process_FIR_I_32K(void)
 {
@@ -60,19 +51,9 @@ void Process_FIR_Q_32K(void)
 	arm_fir_q15(&S_FIR_Q_32K, &FIR_Q_In[0], &FIR_Q_Out[0], BUFFERSIZE / 4);
 }
 
-arm_rfft_instance_q15 fft_inst;
+static arm_rfft_instance_q15 fft_inst;
 
-void init_DSP(void)
-{
-	arm_rfft_init_q15(&fft_inst, FFT_SIZE, 0, 1);
-	for (int i = 0; i < FFT_SIZE; ++i)
-		window[i] = ft_blackman_i(i, FFT_SIZE);
-	offset_step = (int)ft8_buffer_size * 4;
-}
-
-float ft_blackman_i(int i, int N);
-
-float ft_blackman_i(int i, int N)
+static float ft_blackman_i(int i, int N)
 {
 	const float alpha = 0.16f; // or 2860/18608
 	const float a0 = (1 - alpha) / 2;
@@ -85,41 +66,8 @@ float ft_blackman_i(int i, int N)
 	return a0 - a1 * x1 + a2 * x2;
 }
 
-int master_offset;
-
-void process_FT8_FFT(void)
-{
-	for (int i = 0; i < input_gulp_size; i++)
-	{
-		extract_signal[i] = extract_signal[i + input_gulp_size];
-		extract_signal[i + input_gulp_size] = extract_signal[i + 2 * input_gulp_size];
-		extract_signal[i + 2 * input_gulp_size] = FT8_Data[i];
-	}
-
-	if (ft8_flag == 1)
-	{
-
-		master_offset = offset_step * FT_8_counter;
-		extract_power(master_offset);
-
-		for (int k = 0; k < ft8_buffer_size; k++)
-		{
-			FFT_Buffer[k] = export_fft_power[k + master_offset] / 4;
-		}
-
-		Display_WF();
-
-		FT_8_counter++;
-		if (FT_8_counter == ft8_msg_samples)
-		{
-			ft8_flag = 0;
-			decode_flag = 1;
-		}
-	}
-}
-
 // Compute FFT magnitudes (log power) for each timeslot in the signal
-void extract_power(int offset)
+static void extract_power(int offset)
 {
 	// Loop over two possible time offsets (0 and block_size/2)
 	for (int time_sub = 0; time_sub <= input_gulp_size / 2;
@@ -154,6 +102,44 @@ void extract_power(int offset)
 
 				++offset;
 			}
+		}
+	}
+}
+
+void init_DSP(void)
+{
+	arm_rfft_init_q15(&fft_inst, FFT_SIZE, 0, 1);
+	for (int i = 0; i < FFT_SIZE; ++i)
+		window[i] = ft_blackman_i(i, FFT_SIZE);
+	offset_step = (int)ft8_buffer_size * 4;
+}
+
+void process_FT8_FFT(void)
+{
+	for (int i = 0; i < input_gulp_size; i++)
+	{
+		extract_signal[i] = extract_signal[i + input_gulp_size];
+		extract_signal[i + input_gulp_size] = extract_signal[i + 2 * input_gulp_size];
+		extract_signal[i + 2 * input_gulp_size] = FT8_Data[i];
+	}
+
+	if (ft8_flag == 1)
+	{
+		int master_offset = offset_step * FT_8_counter;
+		extract_power(master_offset);
+
+		for (int k = 0; k < ft8_buffer_size; k++)
+		{
+			FFT_Buffer[k] = export_fft_power[k + master_offset] / 4;
+		}
+
+		Display_WF();
+
+		FT_8_counter++;
+		if (FT_8_counter == ft8_msg_samples)
+		{
+			ft8_flag = 0;
+			decode_flag = 1;
 		}
 	}
 }

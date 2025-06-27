@@ -7,6 +7,7 @@
 
 #ifndef SDR_AUDIO_H_
 #define SDR_AUDIO_H_
+
 #include "arm_math.h"
 
 #define BUFFERSIZE 1280 * 4
@@ -32,11 +33,8 @@ extern int DSP_Flag;
 extern int Xmit_Mode;
 extern int xmit_flag, ft8_xmit_counter, ft8_xmit_flag, ft8_xmit_delay;
 
-extern double ft8_shift;
-
 #define ft8_hz 6.25
 
-void transfer_buffers(void);
 void start_duplex(int mode);
 void start_audio_I2C(void);
 void start_codec(void);

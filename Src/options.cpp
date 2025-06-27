@@ -1,4 +1,7 @@
-#include <Display.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "Display.h"
 #include "options.h"
 #include "SDR_Audio.h"
 #include "Codec_Gains.h"
@@ -6,14 +9,12 @@
 #include "button.h"
 #include "DS3231.h"
 
+#include "stm32746g_discovery_sd.h"
+#include "stm32746g_discovery.h"
 #include "stm32fxxx_hal.h"
-#include "stdio.h"
 
 #include "ff.h"		/* Declarations of FatFs API */
 #include "diskio.h" /* Declarations of device I/O functions */
-
-#include "stm32746g_discovery_sd.h"
-#include "stm32746g_discovery.h"
 
 #include "ff_gen_drv.h"
 #include "sd_diskio.h"
@@ -21,15 +22,14 @@
 #include "DS3231.h"
 #include "log_file.h"
 
-#include "stdlib.h"
-
 /* Fatfs structure */
-FATFS SDFatFs;	/* File system object for SD card logical drive */
-FIL MyFile;		/* File object */
+static FATFS SDFatFs;	/* File system object for SD card logical drive */
+static FIL MyFile;		/* File object */
+
 char SDPath[4]; /* SD card logical drive path */
 
 // Order must match OptionNumber in options.h
-OptionStruct s_optionsData[] = {
+static OptionStruct s_optionsData[] = {
 	{
 		/*Name*/ "  Band_Index ", // opt0
 		/*Init*/ _20M,			  // Set default band to 20 meters for 5 Band Board Protection
@@ -61,9 +61,7 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 int16_t Options_Initialize(void)
 {
 	int16_t result = 0;
-	FRESULT fres;
-
-	fres = f_mount(&SDFatFs, SDPath, 1);
+	FRESULT fres = f_mount(&SDFatFs, SDPath, 1);
 	if (fres == FR_OK)
 		fres = f_open(&MyFile, "SaveParams.txt", FA_READ);
 	if (fres == FR_OK)
@@ -88,8 +86,7 @@ int16_t Options_Initialize(void)
 
 void Options_ResetToDefaults(void)
 {
-	int i;
-	for (i = 0; i < NUM_OPTIONS; i++)
+	for (int i = 0; i < NUM_OPTIONS; i++)
 	{
 		Options_SetValue(i, s_optionsData[i].Initial);
 	}
@@ -99,8 +96,7 @@ void Options_ResetToDefaults(void)
 int16_t Options_WriteToMicroSD(void)
 {
 	int16_t result = 1;
-	int i;
-	for (i = 0; i < NUM_OPTIONS; i++)
+	for (int i = 0; i < NUM_OPTIONS; i++)
 	{
 		if (Write_Int_MicroSD(i, Options_GetValue(i)) == 0)
 			result = 0;
@@ -113,8 +109,7 @@ const int16_t badValue = 0xbaad;
 int16_t Options_ReadFromMicroSD(void)
 {
 	int16_t result = 1;
-	int i;
-	for (i = 0; i < NUM_OPTIONS; i++)
+	for (int i = 0; i < NUM_OPTIONS; i++)
 	{
 		int16_t newValue = Read_Int_MicroSD(i);
 		if (newValue != badValue)
@@ -141,8 +136,7 @@ void Options_SetMinimum(int newMinimum)
 int16_t Write_Int_MicroSD(uint16_t DiskBlock, int16_t value)
 {
 	int16_t result = 0;
-	char read_buffer[132];
-	memset(read_buffer, 0, sizeof(read_buffer));
+	char read_buffer[32] = {0};
 	FRESULT fres = f_mount(&SDFatFs, SDPath, 1);
 	if (fres == FR_OK)
 		fres = f_open(&MyFile, "SaveParams.txt", FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
@@ -152,7 +146,7 @@ int16_t Write_Int_MicroSD(uint16_t DiskBlock, int16_t value)
 		if (fres == FR_OK)
 		{
 			sprintf(read_buffer, "%2i", value);
-			fres = f_puts(read_buffer, &MyFile);
+			fres = (FRESULT)f_puts(read_buffer, &MyFile);
 			if (fres > 0 && fres < sizeof(read_buffer))
 				result = 1;
 		}
@@ -164,8 +158,7 @@ int16_t Write_Int_MicroSD(uint16_t DiskBlock, int16_t value)
 int16_t Read_Int_MicroSD(uint16_t DiskBlock)
 {
 	int16_t result = badValue;
-	char read_buffer[132];
-	memset(read_buffer, 0, sizeof(read_buffer));
+	char read_buffer[32] = {0};
 	FRESULT fres = f_mount(&SDFatFs, SDPath, 1);
 	if (fres == FR_OK)
 		fres = f_open(&MyFile, "SaveParams.txt", FA_READ);

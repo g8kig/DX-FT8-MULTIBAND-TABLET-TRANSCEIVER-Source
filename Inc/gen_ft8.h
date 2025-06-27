@@ -23,8 +23,6 @@ extern int Target_RSL;
 #define REPLY_MESSAGE_SIZE 28
 
 extern char reply_message[REPLY_MESSAGE_SIZE];
-extern char reply_message_list[REPLY_MESSAGE_SIZE][8];
-extern int reply_message_count;
 
 extern char SDPath[4]; /* SD card logical drive path */
 

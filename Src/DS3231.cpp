@@ -7,6 +7,7 @@
 
 #include "DS3231.h"
 #include "stm32746g_discovery.h"
+
 #include "Display.h"
 #include "main.h"
 #include "options.h"
@@ -83,8 +84,6 @@ void DS3231_init(void) {
 
 void getTime(unsigned char *p3, unsigned char *p2, unsigned char *p1, short *p0,
 		short hour_format) {
-	unsigned char tmp = 0;
-
 	*p1 = DS3231_Read(secondREG);
 	*p1 = bcd_to_decimal(*p1);
 
@@ -93,7 +92,7 @@ void getTime(unsigned char *p3, unsigned char *p2, unsigned char *p1, short *p0,
 
 	switch (hour_format) {
 	case 1: {
-		tmp = DS3231_Read(hourREG);
+		unsigned char tmp = DS3231_Read(hourREG);
 		tmp &= 0x20;
 		*p0 = (short) (tmp >> 5);
 		*p3 = (0x1F & DS3231_Read(hourREG));

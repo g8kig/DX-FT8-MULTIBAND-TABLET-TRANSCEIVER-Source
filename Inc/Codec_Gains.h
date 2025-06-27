@@ -27,11 +27,12 @@
 
 #define DAC_GAIN_MIN 0
 #define DAC_GAIN_MAX 63
-#define HP_GAIN_MIN 0
-#define HP_GAIN_MAX 63
+#define HP_GAIN_MIN 64
+#define HP_GAIN_MAX 127
 
 #define ADC_GAIN_MIN 1
 #define ADC_GAIN_MAX 255
+
 void Set_Headphone_Gain(int HP_gain);
 void Set_PGA_Gain(int PGA_gain);
 void Set_ADC_DVC(int ADC_gain);

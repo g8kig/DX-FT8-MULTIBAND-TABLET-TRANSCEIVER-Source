@@ -12,25 +12,24 @@
  *      Author: w2ctx
  */
 
-#include "log_file.h"
+#include <stdio.h>
+
 #include "stm32746g_discovery_ts.h"
 #include "stm32746g_discovery_lcd.h"
-#include "button.h"
-/* Include core modules */
+#include "stm32746g_discovery_sd.h"
+#include "stm32746g_discovery.h"
 #include "stm32fxxx_hal.h"
 
-#include <stdio.h>
+#include "log_file.h"
 
 #include "ff.h"		/* Declarations of FatFs API */
 #include "diskio.h" /* Declarations of device I/O functions */
-#include "stdio.h"
-#include "stm32746g_discovery_sd.h"
-#include "stm32746g_discovery.h"
 
 #include "ff_gen_drv.h"
 #include "sd_diskio.h"
 #include "arm_math.h"
 
+#include "button.h"
 #include "Display.h"
 #include "main.h"
 #include "gen_ft8.h"

@@ -20,9 +20,10 @@
  */
 
 #include "stm32746g_discovery.h"
+#include "stm32746g_discovery_audio.h"
+
 #include "Codec_Gains.h"
 #include "wm8994.h"
-#include "stm32746g_discovery_audio.h"
 
 static int minmax(int value, int min, int max)
 {
@@ -31,16 +32,16 @@ static int minmax(int value, int min, int max)
 	if (value < min)
 		value = min;
 	return value;
-} // End of minmax
+}
 
 void Set_Headphone_Gain(int HP_gain)
 {
 	HP_gain = minmax(HP_gain, HP_GAIN_MIN, HP_GAIN_MAX);
-	AUDIO_IO_Write(AUDIO_I2C_ADDRESS, 0x001C, HP_gain + 64);
+	AUDIO_IO_Write(AUDIO_I2C_ADDRESS, 0x001C, HP_gain);
 	HAL_Delay(1);
-	AUDIO_IO_Write(AUDIO_I2C_ADDRESS, 0x001D, HP_gain + 320);
+	AUDIO_IO_Write(AUDIO_I2C_ADDRESS, 0x001D, HP_gain + 256);
 	HAL_Delay(1);
-} // End of Set_HP_Gain
+}
 
 void Set_PGA_Gain(int PGA_gain)
 {
@@ -49,7 +50,7 @@ void Set_PGA_Gain(int PGA_gain)
 	HAL_Delay(1);
 	AUDIO_IO_Write(AUDIO_I2C_ADDRESS, 0x001A, PGA_gain + 256);
 	HAL_Delay(1);
-} // End of Set_PGA_gain
+}
 
 void Set_ADC_DVC(int ADC_gain) // gain in 0.375 dB steps
 {
@@ -58,4 +59,4 @@ void Set_ADC_DVC(int ADC_gain) // gain in 0.375 dB steps
 	HAL_Delay(1);
 	AUDIO_IO_Write(AUDIO_I2C_ADDRESS, 0x401, ADC_gain + 256);
 	HAL_Delay(1);
-} // End of Set_ADC_DVC
+}

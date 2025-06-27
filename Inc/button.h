@@ -40,9 +40,9 @@
 
 typedef struct
 {
-	char *text0;
-	char *text1;
-	char *blank;
+	const char *text0;
+	const char *text1;
+	const char *blank;
 	int Active;
 	int Displayed;
 	int state;

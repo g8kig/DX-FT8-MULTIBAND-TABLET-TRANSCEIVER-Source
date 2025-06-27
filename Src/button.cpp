@@ -457,7 +457,7 @@ ButtonStruct sButtonData[NumButtons] = {
 	{// button 33 Free Text 1
 	 /*text0*/ "Free1",
 	 /*text1*/ "Free1",
-	 /*blank*/ "    ",
+	 /*blank*/ "     ",
 	 /*Active*/ 1,
 	 /*Displayed*/ 1,
 	 /*state*/ 0,
@@ -469,7 +469,7 @@ ButtonStruct sButtonData[NumButtons] = {
 	{// button 34 Free Text 2
 	 /*text0*/ "Free2",
 	 /*text1*/ "Free2",
-	 /*blank*/ "    ",
+	 /*blank*/ "     ",
 	 /*Active*/ 1,
 	 /*Displayed*/ 1,
 	 /*state*/ 0,
@@ -528,7 +528,7 @@ void checkButton(void)
 {
 	for (uint16_t button = Clear; button < NumButtons; button++)
 	{
-		if (testButton(sButtonData[button].x, sButtonData[button].y, sButtonData[button].w, sButtonData[button].h) == 1)
+		if (testButton(sButtonData[button].x, sButtonData[button].y, sButtonData[button].w, sButtonData[button].h))
 		{
 			switch (sButtonData[button].Active)
 			{

@@ -12,6 +12,10 @@ extern int Auto_QSO_State;
 extern int Station_RSL;
 extern int Target_RSL;
 
+#define DECODE_CALLSIGN_SIZE 14
+#define DECODE_LOCATOR_SIZE 7
+#define DISPLAY_MESSAGE_SIZE 22
+
 typedef enum _Sequence
 {
     Seq_RSL = 0,
@@ -20,14 +24,14 @@ typedef enum _Sequence
 
 typedef struct
 {
-    char call_to[14]; // call also be 'CQ'
-    char call_from[14];
-    char locator[7]; // can also be a response 'RR73' etc.
+    char call_to[DECODE_CALLSIGN_SIZE]; // call also be 'CQ'
+    char call_from[DECODE_CALLSIGN_SIZE];
+    char locator[DECODE_LOCATOR_SIZE]; // can also be a response 'RR73' etc.
     int freq_hz;
     int sync_score;
     int snr;
     int received_snr;
-    char target_locator[7];
+    char target_locator[DECODE_LOCATOR_SIZE];
     int slot;
     int RR73;
     Sequence sequence;
@@ -35,15 +39,15 @@ typedef struct
 
 typedef struct
 {
-    char message[40];
+    char message[DISPLAY_MESSAGE_SIZE];
     int text_color;
 } display_message;
 
 typedef struct
 {
     int number_times_called;
-    char call[14];
-    char locator[7];
+    char call[DECODE_CALLSIGN_SIZE];
+    char locator[DECODE_LOCATOR_SIZE];
     int RSL;
     int received_RSL;
     int RR73;

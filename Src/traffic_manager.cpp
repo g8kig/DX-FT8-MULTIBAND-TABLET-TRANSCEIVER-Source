@@ -5,7 +5,7 @@
  *      Author: user
  */
 
-#include <Display.h>
+#include "Display.h"
 #include "button.h"
 #include "gen_ft8.h"
 #include "decode_ft8.h"
@@ -25,8 +25,9 @@ const int ADC_DVC_Off = 90;
 int Beacon_State;
 
 int RSL_sent;
-int QSO_xmit_count;
 int RR73_sent;
+
+static int QSO_xmit_count = 0;
 
 void service_QSO_mode(int decoded_signals)
 {

@@ -12,9 +12,12 @@
 #include <ctype.h>
 #include <stdbool.h>
 
+extern "C"
+{
 #include "pack.h"
 #include "encode.h"
 #include "constants.h"
+}
 
 #include "gen_ft8.h"
 
@@ -22,7 +25,6 @@
 #include "diskio.h" /* Declarations of device I/O functions */
 #include "stm32746g_discovery_sd.h"
 #include "stm32746g_discovery.h"
-
 #include "stm32746g_discovery_lcd.h"
 
 #include "ff_gen_drv.h"
@@ -45,8 +47,6 @@ char Target_Locator[LOCATOR_SIZE]; // four character locator  + null terminator
 int Station_RSL;
 
 char reply_message[REPLY_MESSAGE_SIZE];
-char reply_message_list[REPLY_MESSAGE_SIZE][8];
-int reply_message_count;
 
 const int display_start_x = 240;
 const int display_start_y = 240;
@@ -232,7 +232,7 @@ void clear_xmit_messages(void)
 static void set_text(char *text, const char *source, int field_id)
 {
 	strcpy(text, source);
-	for (int i = 0; i < strlen(text); ++i)
+	for (size_t i = 0; i < strlen(text); ++i)
 	{
 		if (!isprint((int)text[i]))
 		{
@@ -316,8 +316,6 @@ static int setup_free_text(const char *free_text, int field_id)
 	return result;
 }
 
-extern uint8_t _ssdram; /* Symbol defined in the linker script */
-
 void Read_Station_File(void)
 {
 	static const char *data_file_name = "StationData.txt";
@@ -330,7 +328,8 @@ void Read_Station_File(void)
 
 	f_mount(&FS, SDPath, 1);
 
-	FILINFO filInfo = {0};
+	FILINFO filInfo;
+	memset(&filInfo, 0, sizeof(FILINFO));
 	if (f_stat(data_file_name, &filInfo) == FR_OK &&
 		f_open(&fil, data_file_name, FA_OPEN_EXISTING | FA_READ) == FR_OK)
 	{

@@ -2,9 +2,9 @@
 
 // Utility functions for characters and strings
 
-const char* trim_front(const char *str);
+const char *trim_front(const char *str);
 void trim_back(char *str);
-char* trim(char *str);
+char *trim(char *str);
 
 char to_upper(char c);
 _Bool is_digit(char c);
@@ -31,6 +31,5 @@ char charn(int c, int table_idx);
 int nchar(char c, int table_idx);
 
 #ifndef stpcpy
-char* stpcpy(char* dst, const char* src);
+char *stpcpy(char *dst, const char *src);
 #endif
-

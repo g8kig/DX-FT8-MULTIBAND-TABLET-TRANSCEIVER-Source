@@ -1,11 +1,13 @@
+#include <stdio.h>
+
 #include "stm32746g_discovery_ts.h"
 #include "stm32746g_discovery_lcd.h"
+
 #include "Process_DSP.h"
 #include "button.h"
 #include "Display.h"
 #include "gen_ft8.h"
 #include "main.h"
-#include "stdio.h"
 #include "decode_ft8.h"
 #include "WF_Table.h"
 
@@ -32,8 +34,7 @@ static char rtc_time_string[RTC_STRING_SIZE];
 #define MAX_LOG_MESSAGES 8
 static display_message log_messages[MAX_LOG_MESSAGES];
 
-#define MAX_BLANK_SIZE 21
-static char blank[MAX_BLANK_SIZE];
+static char blank[DISPLAY_MESSAGE_SIZE];
 static uint8_t blank_initialised = 0;
 
 void update_log_display(int mode)
@@ -194,7 +195,7 @@ void setup_display(void)
 
 	BSP_LCD_DisplayStringAt(0, 60, (const uint8_t *)"DX FT8: A FT8 Xceiver", LEFT_MODE);
 	BSP_LCD_DisplayStringAt(50, 80, (const uint8_t *)"Hardware: V2.0", LEFT_MODE);
-	BSP_LCD_DisplayStringAt(50, 100, (const uint8_t *)"Firmware: V1.9.7", LEFT_MODE);
+	BSP_LCD_DisplayStringAt(50, 100, (const uint8_t *)"Firmware: V1.9.8", LEFT_MODE);
 	BSP_LCD_DisplayStringAt(50, 120, (const uint8_t *)"W5BAA - WB2CBA", LEFT_MODE);
 
 	BSP_LCD_DisplayStringAt(50, 160,
