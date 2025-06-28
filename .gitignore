@@ -1,12 +1,9 @@
 Debug/
-Debug/*
-.cproject
+.cproject/
 .settings/
-.settings/*
 .metadata/
-.metadata/*
-.cproject
-.settings/language.settings.xml
+.pio/
+.vscode/
 Katy.*
-
 .DS_Store
+
