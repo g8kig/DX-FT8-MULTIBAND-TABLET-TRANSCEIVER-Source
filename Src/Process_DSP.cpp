@@ -5,14 +5,15 @@
  *      Author: user
  */
 
+#include <math.h>
+#include <errno.h>
+
 #include "SDR_Audio.h"
 #include "arm_math.h"
 #include "Process_DSP.h"
 #include "arm_common_tables.h"
 #include "main.h"
 #include "Display.h"
-#include <math.h>
-#include <errno.h>
 #include "decode.h"
 #include "FIR_Coefficients.h"
 

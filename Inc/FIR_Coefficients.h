@@ -1,3 +1,6 @@
+
+#pragma once
+
 /*
  * Header file for FIR Coefficients use to do all the DSP filtering
  *
