@@ -1,6 +1,6 @@
 # Makefile for the DX FT8 Multiband Tablet Transceiver project
 # Requires GNU Make and the ARM GCC toolchain from the PlatformIO toolset to be installed
-# Optionally also requires the ST-Link tools for flashing the STM32F7 microcontroller
+# Optionally also requires the ST-Link tools (sudo apt -y install stlink-tools) for flashing the STM32F7 microcontroller
 # Install platformio-cli and then run 'pio pkg install --tool toolchain-gccarmnoneeabi@@~1.100301.0' to install the toolchain
 # To install GNU Make on Windows see https://stackoverflow.com/questions/32127524/how-to-install-and-use-make-in-windows
 

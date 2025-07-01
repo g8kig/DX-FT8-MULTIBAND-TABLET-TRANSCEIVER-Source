@@ -5,14 +5,13 @@
  *      Author: user
  */
 
-#include <stdlib.h>
-
 #include "SDR_Audio.h"
 #include "stm32746g_discovery_audio.h"
 #include "wm8994.h"
 #include "stm32746g_discovery_lcd.h"
 #include "arm_math.h"
 #include "Process_DSP.h"
+#include <stdlib.h>
 
 #include "button.h"
 #include "Sine_table.h"

@@ -72,6 +72,10 @@ static void SystemClock_Config(void);
 static void Error_Handler(void);
 static void CPU_CACHE_Enable(void);
 static void InitialiseDisplay(void);
+static bool Initialise_Serial();
+
+static UART_HandleTypeDef s_UART1Handle = UART_HandleTypeDef();
+static UART_HandleTypeDef s_UART2Handle = UART_HandleTypeDef();
 
 static void update_synchronization(void)
 {
@@ -112,6 +116,11 @@ int main(void)
 	DeInit_BoardVersionInput();
 
 	InitialiseDisplay();
+	if (!Initialise_Serial())
+	{
+		Error_Handler();
+	}
+
 	HAL_Delay(10);
 	BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
 
@@ -144,6 +153,7 @@ int main(void)
 	FT8_Sync();
 	HAL_Delay(10);
 
+	logger("Main loop starting", __FILE__, __LINE__);
 	while (1)
 	{
 		if (DSP_Flag)
@@ -218,7 +228,6 @@ int main(void)
 
 		if (!Tune_On && FT8_Touch_Flag && !Beacon_On)
 			process_selected_Station(master_decoded, FT_8_TouchIndex);
-
 
 		update_synchronization();
 	}
@@ -304,15 +313,16 @@ void SystemClock_Config(void)
 	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
 	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
 	RCC_OscInitStruct.PLL.PLLM = 25;
-	RCC_OscInitStruct.PLL.PLLN = 400;
+	RCC_OscInitStruct.PLL.PLLN = 432;
 	RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
 	RCC_OscInitStruct.PLL.PLLQ = 8;
+
 	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
 	{
 		Error_Handler();
 	}
 
-	/* Activate the OverDrive to reach the 200 Mhz Frequency */
+	/* Activate the OverDrive to reach the 216 Mhz Frequency */
 	if (HAL_PWREx_EnableOverDrive() != HAL_OK)
 	{
 		Error_Handler();
@@ -367,6 +377,74 @@ static void CPU_CACHE_Enable(void)
 
 	/* Enable D-Cache */
 	SCB_EnableDCache();
+}
+
+static bool Initialise_Serial()
+{
+	__USART1_CLK_ENABLE();
+	__USART3_CLK_ENABLE();
+	__GPIOA_CLK_ENABLE();
+	__GPIOB_CLK_ENABLE();
+
+	GPIO_InitTypeDef GPIO_InitStructure;
+
+	// Serial debug Port USART1 TX/RX : PA9/PB7
+	GPIO_InitStructure.Pin = GPIO_PIN_9; // TX
+	GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
+	GPIO_InitStructure.Alternate = GPIO_AF7_USART1;
+	GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
+	GPIO_InitStructure.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	GPIO_InitStructure.Pin = GPIO_PIN_7; // RX
+	GPIO_InitStructure.Mode = GPIO_MODE_AF_OD;
+	GPIO_InitStructure.Alternate = GPIO_AF7_USART3;
+	GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
+	GPIO_InitStructure.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	// Serial port USART_3 TX/RX : PB10/PB11
+	GPIO_InitStructure.Pin = GPIO_PIN_10; // TX
+	GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
+	GPIO_InitStructure.Alternate = GPIO_AF7_USART3;
+	GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
+	GPIO_InitStructure.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	GPIO_InitStructure.Pin = GPIO_PIN_11; // RX
+	GPIO_InitStructure.Mode = GPIO_MODE_AF_OD;
+	GPIO_InitStructure.Alternate = GPIO_AF7_USART3;
+	GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
+	GPIO_InitStructure.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	s_UART1Handle.Instance = USART1;
+	s_UART1Handle.Init.BaudRate = 115200;
+	s_UART1Handle.Init.WordLength = UART_WORDLENGTH_8B;
+	s_UART1Handle.Init.StopBits = UART_STOPBITS_1;
+	s_UART1Handle.Init.Parity = UART_PARITY_NONE;
+	s_UART1Handle.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	s_UART1Handle.Init.Mode = UART_MODE_TX_RX;
+
+	s_UART2Handle.Instance = USART3;
+	s_UART2Handle.Init.BaudRate = 9600;
+	s_UART2Handle.Init.WordLength = UART_WORDLENGTH_8B;
+	s_UART2Handle.Init.StopBits = UART_STOPBITS_1;
+	s_UART2Handle.Init.Parity = UART_PARITY_NONE;
+	s_UART2Handle.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	s_UART2Handle.Init.Mode = UART_MODE_TX_RX;
+
+	return ((HAL_UART_Init(&s_UART1Handle) == HAL_OK) &&
+		  (HAL_UART_Init(&s_UART2Handle) == HAL_OK));
+}
+
+void logger(const char *message, const char* file, int line)
+{
+  char buffer[256];
+  if (snprintf(buffer, sizeof(buffer), "%s:%d: %s\n", file, line, message) > 0)
+  {
+  	HAL_UART_Transmit(&s_UART1Handle, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
+  }
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
