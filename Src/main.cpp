@@ -1,10 +1,6 @@
 /**
  ******************************************************************************
- * @file    USB_Host/HID_Standalone/Src/main.c
- * @author  MCD Application Team
- * @version V1.0.2
- * @date    18-November-2015
- * @brief   USB host HID Mouse and Keyboard demo main file
+ * @brief   Main file
  ******************************************************************************
  * @attention
  *
@@ -48,7 +44,6 @@ extern "C"
 
 #include "decode_ft8.h"
 #include "gen_ft8.h"
-#include "log_file.h"
 #include "traffic_manager.h"
 #include "button.h"
 #include "DS3231.h"
@@ -75,7 +70,6 @@ static void InitialiseDisplay(void);
 static bool Initialise_Serial();
 
 static UART_HandleTypeDef s_UART1Handle = UART_HandleTypeDef();
-static UART_HandleTypeDef s_UART2Handle = UART_HandleTypeDef();
 
 static void update_synchronization(void)
 {
@@ -382,7 +376,6 @@ static void CPU_CACHE_Enable(void)
 static bool Initialise_Serial()
 {
 	__USART1_CLK_ENABLE();
-	__USART3_CLK_ENABLE();
 	__GPIOA_CLK_ENABLE();
 	__GPIOB_CLK_ENABLE();
 
@@ -403,21 +396,6 @@ static bool Initialise_Serial()
 	GPIO_InitStructure.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-	// Serial port USART_3 TX/RX : PB10/PB11
-	GPIO_InitStructure.Pin = GPIO_PIN_10; // TX
-	GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
-	GPIO_InitStructure.Alternate = GPIO_AF7_USART3;
-	GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
-	GPIO_InitStructure.Pull = GPIO_NOPULL;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
-
-	GPIO_InitStructure.Pin = GPIO_PIN_11; // RX
-	GPIO_InitStructure.Mode = GPIO_MODE_AF_OD;
-	GPIO_InitStructure.Alternate = GPIO_AF7_USART3;
-	GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
-	GPIO_InitStructure.Pull = GPIO_NOPULL;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
-
 	s_UART1Handle.Instance = USART1;
 	s_UART1Handle.Init.BaudRate = 115200;
 	s_UART1Handle.Init.WordLength = UART_WORDLENGTH_8B;
@@ -426,25 +404,16 @@ static bool Initialise_Serial()
 	s_UART1Handle.Init.HwFlowCtl = UART_HWCONTROL_NONE;
 	s_UART1Handle.Init.Mode = UART_MODE_TX_RX;
 
-	s_UART2Handle.Instance = USART3;
-	s_UART2Handle.Init.BaudRate = 9600;
-	s_UART2Handle.Init.WordLength = UART_WORDLENGTH_8B;
-	s_UART2Handle.Init.StopBits = UART_STOPBITS_1;
-	s_UART2Handle.Init.Parity = UART_PARITY_NONE;
-	s_UART2Handle.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-	s_UART2Handle.Init.Mode = UART_MODE_TX_RX;
-
-	return ((HAL_UART_Init(&s_UART1Handle) == HAL_OK) &&
-		  (HAL_UART_Init(&s_UART2Handle) == HAL_OK));
+	return (HAL_UART_Init(&s_UART1Handle) == HAL_OK);
 }
 
-void logger(const char *message, const char* file, int line)
+void logger(const char *message, const char *file, int line)
 {
-  char buffer[256];
-  if (snprintf(buffer, sizeof(buffer), "%s:%d: %s\n", file, line, message) > 0)
-  {
-  	HAL_UART_Transmit(&s_UART1Handle, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
-  }
+	char buffer[256];
+	if (snprintf(buffer, sizeof(buffer), "%s:%d: %s\n", file, line, message) > 0)
+	{
+		HAL_UART_Transmit(&s_UART1Handle, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
+	}
 }
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+/************************ Portions (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

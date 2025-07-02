@@ -20,7 +20,6 @@
 #include "sd_diskio.h"
 
 #include "DS3231.h"
-#include "log_file.h"
 
 /* Fatfs structure */
 static FATFS SDFatFs;	/* File system object for SD card logical drive */

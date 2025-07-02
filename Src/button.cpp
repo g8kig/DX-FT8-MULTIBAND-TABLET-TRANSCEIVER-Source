@@ -15,7 +15,6 @@
 #include "main.h"
 #include "stm32fxxx_hal.h"
 #include "Process_DSP.h"
-#include "log_file.h"
 #include "gen_ft8.h"
 #include "traffic_manager.h"
 #include "DS3231.h"

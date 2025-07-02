@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "log_file.h"
+
 #include "button.h"
 
 static unsigned num_digits(int num)
@@ -43,6 +43,10 @@ static unsigned num_chars(const char *ptr)
 	return (unsigned)strlen(trim_front(ptr));
 }
 
+/* Fatfs structure */
+static FATFS FS;
+static FIL LogFile;
+
 void write_ADIF_Log(void)
 {
 	make_Real_Time();
@@ -50,9 +54,9 @@ void write_ADIF_Log(void)
 
 	if (Logging_State)
 	{
-		static char log_line[220];
+		static char log_line[256];
 		const char *freq = sBand_Data[BandIndex].display;
-	
+
 		int offset = sprintf(log_line, "<call:%1u>%s ", num_chars(Target_Call), trim_front(Target_Call));
 		int target_locator_len = num_chars(Target_Locator);
 		if (target_locator_len > 0)
@@ -70,8 +74,22 @@ void write_ADIF_Log(void)
 		rsl_len = num_digits(Station_RSL);
 		if (rsl_len > 0)
 			offset += sprintf(log_line + offset, "<rst_rcvd:%1u:N>%i ", rsl_len, Station_RSL);
-		strcpy(log_line + offset, "<tx_pwr:4>0.5 <eor>");
+		strcpy(log_line + offset, "<tx_pwr:4>0.5 <eor>\n");
 
-		Write_Log_Data(log_line);
+		FRESULT res = f_mount(&FS, "SD:", 1);
+		if (res == FR_OK)
+		{
+			res = f_open(&LogFile, file_name_string,
+				   FA_OPEN_ALWAYS | FA_WRITE | FA_OPEN_APPEND);
+		}
+		if (res == FR_OK)
+		{
+			res = f_lseek(&LogFile, f_size(&LogFile));
+			if (res == FR_OK)
+			{
+				f_puts(str, &LogFile);
+			}
+		}
+		f_close(&LogFile);
 	}
 }

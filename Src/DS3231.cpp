@@ -11,7 +11,6 @@
 #include "Display.h"
 #include "main.h"
 #include "options.h"
-#include "log_file.h"
 
 char log_rtc_time_string[RTC_STRING_SIZE];
 char log_rtc_date_string[RTC_STRING_SIZE];
@@ -162,7 +161,6 @@ void display_RealTime(int x, int y) {
 	if (rtc_hour < old_rtc_hour) {
 		getDate(&rtc_dow, &rtc_date, &rtc_month, &rtc_year);
 		display_Real_Date(0, 240);
-		Init_Log_File();
 	}
 	show_UTC_time(x, y, rtc_hour, rtc_minute, rtc_second, 0);
 }
