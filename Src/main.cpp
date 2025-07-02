@@ -423,7 +423,7 @@ static bool Initialise_Serial()
 	s_hI2C.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
 	s_hI2C.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
 
-	return ((HAL_I2C_Init(&s_hI2C) != HAL_OK) && 
+	return ((HAL_I2C_Init(&s_hI2C) == HAL_OK) && 
 			(HAL_UART_Init(&s_UART1Handle) == HAL_OK));
 }
 
