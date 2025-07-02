@@ -414,10 +414,16 @@ static bool Initialise_Serial()
 	s_UART1Handle.Init.Mode = UART_MODE_TX_RX;
 
 	s_hI2C.Instance = I2C1;
-	s_hI2C.Init.Timing = 0x00000E14; // 100 Khz
+	s_hI2C.Init.Timing = 0x00100413;
+	s_hI2C.Init.OwnAddress1 = 0;
 	s_hI2C.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+	s_hI2C.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+	s_hI2C.Init.OwnAddress2 = 0;
+	s_hI2C.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+	s_hI2C.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+	s_hI2C.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
 
-	return ((HAL_I2C_Init(&s_hI2C) != HAL_OK) &&
+	return ((HAL_I2C_Init(&s_hI2C) != HAL_OK) && 
 			(HAL_UART_Init(&s_UART1Handle) == HAL_OK));
 }
 
