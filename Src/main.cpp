@@ -144,7 +144,6 @@ int main(void)
 	receive_sequence();
 	HAL_Delay(10);
 	Set_Headphone_Gain(94);
-	Init_Log_File();
 	FT8_Sync();
 	HAL_Delay(10);
 
@@ -415,11 +414,11 @@ static bool Initialise_Serial()
 	s_UART1Handle.Init.Mode = UART_MODE_TX_RX;
 
 	s_hI2C.Instance = I2C1;
+	s_hI2C.Init.Timing = 0x00000E14; // 100 Khz
 	s_hI2C.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-	s_hI2C.Init.ClockSpeed = 10240;
-	s_hI2C.Init.DutyCycle = I2C_DUTYCYCLE_2;
 
-	return ((HAL_I2C_Init(&s_hI2C) != HAL_OK) && (HAL_UART_Init(&s_UART1Handle) == HAL_OK));
+	return ((HAL_I2C_Init(&s_hI2C) != HAL_OK) &&
+			(HAL_UART_Init(&s_UART1Handle) == HAL_OK));
 }
 
 void logger(const char *message, const char *file, int line)

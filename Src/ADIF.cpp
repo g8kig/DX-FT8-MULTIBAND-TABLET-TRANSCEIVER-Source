@@ -6,14 +6,16 @@
  */
 
 #include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 #include "ADIF.h"
 #include "gen_ft8.h"
 #include "DS3231.h"
 #include "decode_ft8.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+#include "ff.h"		/* Declarations of FatFs API */
+#include "diskio.h" /* Declarations of device I/O functions */
 
 #include "button.h"
 
@@ -87,7 +89,7 @@ void write_ADIF_Log(void)
 			res = f_lseek(&LogFile, f_size(&LogFile));
 			if (res == FR_OK)
 			{
-				f_puts(str, &LogFile);
+				f_puts(log_line, &LogFile);
 			}
 		}
 		f_close(&LogFile);
