@@ -1,6 +1,10 @@
 /**
  ******************************************************************************
- * @brief   Main file
+ * @file    USB_Host/HID_Standalone/Src/main.c
+ * @author  MCD Application Team
+ * @version V1.0.2
+ * @date    18-November-2015
+ * @brief   USB host HID Mouse and Keyboard demo main file
  ******************************************************************************
  * @attention
  *
@@ -44,6 +48,7 @@ extern "C"
 
 #include "decode_ft8.h"
 #include "gen_ft8.h"
+#include "log_file.h"
 #include "traffic_manager.h"
 #include "button.h"
 #include "DS3231.h"
@@ -427,13 +432,13 @@ static bool Initialise_Serial()
 			(HAL_UART_Init(&s_UART1Handle) == HAL_OK));
 }
 
-void logger(const char *message, const char *file, int line)
+void logger(const char *message, const char* file, int line)
 {
-	char buffer[256];
-	if (snprintf(buffer, sizeof(buffer), "%s:%d: %s\n", file, line, message) > 0)
-	{
-		HAL_UART_Transmit(&s_UART1Handle, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
-	}
+  char buffer[256];
+  if (snprintf(buffer, sizeof(buffer), "%s:%d: %s\n", file, line, message) > 0)
+  {
+  	HAL_UART_Transmit(&s_UART1Handle, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
+  }
 }
 
-/************************ Portions (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

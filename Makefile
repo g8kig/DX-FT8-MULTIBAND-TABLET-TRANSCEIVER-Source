@@ -170,6 +170,7 @@ Src/Display.cpp \
 Src/DS3231.cpp \
 Src/FIR_Coefficients.cpp \
 Src/gen_ft8.cpp \
+Src/log_file.cpp \
 Src/main.cpp \
 Src/options.cpp \
 Src/Process_DSP.cpp \
